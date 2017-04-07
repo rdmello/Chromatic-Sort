@@ -21,7 +21,7 @@ void doREPL(Magick::Image& image, std::string fileout);
 int main() {
 
     /* File definitions */
-    std::string filename = "images/magritte";
+    std::string filename = "images/pyramid";
     std::string fileext = "tiff";
     std::string filein = filename + "." + fileext; // define input filename
     std::string fileout = filename + "_out" + "." + fileext; // define output filename
@@ -95,7 +95,7 @@ void doREPL(Magick::Image& image, std::string fileout) {
                 ct1 = &bf1;
                 break;
         }
-
+/*
         double threshval_low = 0.5;
         std::cout << "Enter color floor (0.00 - 1.00): ";
         std::cin >> threshval_low;
@@ -105,7 +105,27 @@ void doREPL(Magick::Image& image, std::string fileout) {
         std::cin >> threshval_high;
         PooledMatcher pm{threshval_low, threshval_high};
         cm1 = &pm;
+*/
+        double redval = 0.5;
+        std::cout << "Enter red channel matcher (0.00 - 1.00): ";
+        std::cin >> redval;
+      
+        double greenval = 0.5;
+        std::cout << "Enter green channel matcher (0.00 - 1.00): ";
+        std::cin >> greenval;
 
+        double blueval = 0.5;
+        std::cout << "Enter blue channel matcher (0.00 - 1.00): ";
+        std::cin >> blueval;
+
+        double radius = 0.1;
+        std::cout << "Enter radius of matcher (0.00 - 1.00): ";
+        std::cin >> radius;
+
+        Magick::ColorRGB matchColor{redval, greenval, blueval};
+        ColorThreshMatcher pm{ matchColor, radius };
+        cm1 = &pm;
+        
         SortDirection dirX = SortDirection::Inc;
         char sdirx; 
         std::cout << "Enter sort direction x (i, d): ";

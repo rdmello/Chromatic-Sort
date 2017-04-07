@@ -26,7 +26,7 @@ struct CoolMatcher : public ColorMatcher {
     virtual bool match(Magick::ColorRGB &color);    
 };
 
-/* Constructor has two to set internal state 
+/* Constructor has two inputs to set internal state 
  * of the matcher function */
 struct PooledMatcher : public ColorMatcher {
     PooledMatcher(double th_low, double th_high);
@@ -34,6 +34,16 @@ struct PooledMatcher : public ColorMatcher {
 private:
     double pool_threshold_high;
     double pool_threshold_low;
+};
+
+/* ColorThreshMatcher matches one specific RGB color within
+ * the threshold specified by thresh */
+struct ColorThreshMatcher : public ColorMatcher {
+    ColorThreshMatcher(Magick::ColorRGB color, double radius);
+    virtual bool match(Magick::ColorRGB &color);
+private:
+    Magick::ColorRGB color;
+    double radius;
 };
 
 #endif /* _COLORMATCHER_HPP_ */

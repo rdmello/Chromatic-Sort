@@ -20,7 +20,7 @@
 void doREPL(std::vector<Magick::Image>& image, std::string fileout);
 
 int main (int argc, char** argv) {
-    std::string filename = "images/run";
+    std::string filename = "images/waterfall";
     std::string fileext = "gif";
     std::string filein = filename + "." + fileext; // define input filename
     std::string fileout = filename + "_out" + "." + fileext; // define output filename
@@ -83,17 +83,26 @@ void doREPL(std::vector<Magick::Image>& image, std::string fileout) {
                 break;
         }
 
-        /*
-        double threshval_low = 0.5;
-        std::cout << "Enter color floor (0.00 - 1.00): ";
-        std::cin >> threshval_low;
-        
-        double threshval_high = 0.5;
-        std::cout << "Enter color ceil (0.00 - 1.00): ";
-        std::cin >> threshval_high;
-        PooledMatcher pm{threshval_low, threshval_high};
+        double redval = 0.5;
+        std::cout << "Enter red channel matcher (0.00 - 1.00): ";
+        std::cin >> redval;
+      
+        double greenval = 0.5;
+        std::cout << "Enter green channel matcher (0.00 - 1.00): ";
+        std::cin >> greenval;
+
+        double blueval = 0.5;
+        std::cout << "Enter blue channel matcher (0.00 - 1.00): ";
+        std::cin >> blueval;
+
+        double radius = 0.1;
+        std::cout << "Enter radius of matcher (0.00 - 1.00): ";
+        std::cin >> radius;
+
+        Magick::ColorRGB matchColor{redval, greenval, blueval};
+        ColorThreshMatcher pm{ matchColor, radius };
         cm1 = &pm;
-*/
+        
         SortDirection dirX = SortDirection::Inc;
         char sdirx; 
         std::cout << "Enter sort direction x (i, d): ";
@@ -143,8 +152,10 @@ void doREPL(std::vector<Magick::Image>& image, std::string fileout) {
        
         Magick::coalesceImages(&image, image.begin(), image.end());
 
+        std::cout << "Sorting image: ";
+
         for (int i = 0; i < image.size(); ++i) {
-            std::cout << "Sorting image: " << i << " " << std::endl;
+            std::cout << i << " " << std::flush;
             sortPixelBlocks(image[i], borderx, bordery, borderwidth, borderheight, x, y, w, h, *cm1, *ct1, dirX, dirY, ol);
         }
         

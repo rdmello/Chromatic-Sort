@@ -23,4 +23,20 @@ bool PooledMatcher::match(Magick::ColorRGB &color) {
     return (colorSum >= this->pool_threshold_low) && (colorSum <= this->pool_threshold_high);
 }
 
+ColorThreshMatcher::ColorThreshMatcher(Magick::ColorRGB color, double radius)
+    : color{color}, radius{radius} {};
+
+bool ColorThreshMatcher::match(Magick::ColorRGB &color) {
+    if ((color.red() < this->color.red() + radius) && 
+        (color.red() > this->color.red() - radius) && 
+        (color.blue() < this->color.blue() + radius) && 
+        (color.blue() > this->color.blue() - radius) && 
+        (color.green() < this->color.green() + radius) && 
+        (color.green() > this->color.green() - radius)) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 
