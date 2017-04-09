@@ -1,6 +1,6 @@
 /*
  * ColorMatcher.hpp
- * This file defines the ColorMatcher class a few 
+ * This file defines the ColorMatcher class a few
  * utility Matchers which implement the class
  */
 
@@ -18,15 +18,15 @@ struct ColorMatcher {
 
 /* Matches all colors in an image */
 struct AllMatcher : public ColorMatcher {
-    virtual bool match(Magick::ColorRGB &color);    
+    virtual bool match(Magick::ColorRGB &color);
 };
 
 /* Debug function, matches half of the RGB colorspace */
 struct CoolMatcher : public ColorMatcher {
-    virtual bool match(Magick::ColorRGB &color);    
+    virtual bool match(Magick::ColorRGB &color);
 };
 
-/* Constructor has two inputs to set internal state 
+/* Constructor has two inputs to set internal state
  * of the matcher function */
 struct PooledMatcher : public ColorMatcher {
     PooledMatcher(double th_low, double th_high);
@@ -47,4 +47,3 @@ private:
 };
 
 #endif /* _COLORMATCHER_HPP_ */
-

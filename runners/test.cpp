@@ -47,8 +47,9 @@ void doREPL(Magick::Image& image, std::string fileout) {
     RedFilter rf1{};
     BlueFilter bf1{};
     GreenFilter gf1{};
+    AsendorfTransform at1{};
     
-    ColorTransformer *ct1 = &rf1;
+    ColorTransformer *ct1 = &at1;
 
     int replIter = 0;
     while (true) {
@@ -80,7 +81,7 @@ void doREPL(Magick::Image& image, std::string fileout) {
 
         // std::cout << "Enter y: ";
         // std::cin >> y;
-
+/*
         char scolor;
         std::cout << "Enter color to sort (r, g, b): ";
         std::cin >> scolor;
@@ -95,6 +96,7 @@ void doREPL(Magick::Image& image, std::string fileout) {
                 ct1 = &bf1;
                 break;
         }
+        */
 /*
         double threshval_low = 0.5;
         std::cout << "Enter color floor (0.00 - 1.00): ";
@@ -105,7 +107,7 @@ void doREPL(Magick::Image& image, std::string fileout) {
         std::cin >> threshval_high;
         PooledMatcher pm{threshval_low, threshval_high};
         cm1 = &pm;
-*/
+        
         double redval = 0.5;
         std::cout << "Enter red channel matcher (0.00 - 1.00): ";
         std::cin >> redval;
@@ -121,49 +123,49 @@ void doREPL(Magick::Image& image, std::string fileout) {
         double radius = 0.1;
         std::cout << "Enter radius of matcher (0.00 - 1.00): ";
         std::cin >> radius;
-
+        
         Magick::ColorRGB matchColor{redval, greenval, blueval};
         ColorThreshMatcher pm{ matchColor, radius };
         cm1 = &pm;
-        
+       */ 
         SortDirection dirX = SortDirection::Inc;
-        char sdirx; 
-        std::cout << "Enter sort direction x (i, d): ";
-        std::cin >> sdirx;
-        switch (sdirx) {
-            case 'i':
-                dirX = SortDirection::Inc;
-                break;
-            case 'd':
-                dirX = SortDirection::Dec;
-                break;
-        }
+//        char sdirx; 
+//        std::cout << "Enter sort direction x (i, d): ";
+//        std::cin >> sdirx;
+//        switch (sdirx) {
+//            case 'i':
+//                dirX = SortDirection::Inc;
+//                break;
+//            case 'd':
+//                dirX = SortDirection::Dec;
+//                break;
+//        }
     
         SortDirection dirY = SortDirection::Inc;
-        char sdiry; 
-        std::cout << "Enter sort direction y (i, d): ";
-        std::cin >> sdiry;
-        switch (sdiry) {
-            case 'i':
-                dirY = SortDirection::Inc;
-                break;
-            case 'd':
-                dirY = SortDirection::Dec;
-                break;
-        }
+//        char sdiry; 
+//        std::cout << "Enter sort direction y (i, d): ";
+//        std::cin >> sdiry;
+//        switch (sdiry) {
+//            case 'i':
+//                dirY = SortDirection::Inc;
+//                break;
+//            case 'd':
+//                dirY = SortDirection::Dec;
+//                break;
+//        }
 
         OuterLoop ol = OuterLoop::Y;
-        char oloop; 
-        std::cout << "Enter outer loop choice (x, y): ";
-        std::cin >> oloop;
-        switch (oloop) {
-            case 'x':
-                ol = OuterLoop::X;
-                break;
-            case 'y':
-                ol = OuterLoop::Y;
-                break;
-        }
+//        char oloop; 
+//        std::cout << "Enter outer loop choice (x, y): ";
+//        std::cin >> oloop;
+//        switch (oloop) {
+//            case 'x':
+//                ol = OuterLoop::X;
+//                break;
+//            case 'y':
+//                ol = OuterLoop::Y;
+//                break;
+//        }
 
         std::cout << "Enter w: ";
         std::cin >> w;
