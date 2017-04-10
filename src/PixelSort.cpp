@@ -1,13 +1,13 @@
 
-#include "PixelSorter.hpp"
-#include "Coordinate.hpp"
+#include "PixelSort.hpp"
 
-void writeColor(Magick::Color color, Magick::Quantum* location) {
+void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
     *location = color.quantumRed();
     *(location+1) = color.quantumGreen();
     *(location+2) = color.quantumBlue();
 }
 
+/*
 void colorPixels(Magick::Image& image, int x, int y, int runWidth, int runLength) {
     int width = runWidth;
     int height = runLength;
@@ -33,8 +33,49 @@ void colorPixels(Magick::Image& image, int x, int y, int runWidth, int runLength
     }
     image.syncPixels();
 }
+*/
 
+void PixelSort::readImageToPixelVector(Magick::Image& image, PixelVector& pixels) {
+    image.modifyImage();
+    image.type(Magick::TrueColorType);
+    Magick::Quantum* a = image.getPixels(0, 0, image.columns(), image.rows());
+    int width = image.columns();
 
+    for(int j = 0; j < image.rows(); ++j) {
+        for(int i = 0; i < 3 * image.columns(); i += 3) {
+            int idx = i + (j * 3 * width);
+            Magick::Color color(a[idx], a[idx+1], a[idx+2]);
+            Magick::ColorRGB rgbColor(color);
+            Coordinate coord(i/3, j);
+            pixels.push_back(Pixel(coord, color));
+        }
+    }
+}
+
+void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image) {
+    image.modifyImage();
+    image.type(Magick::TrueColorType);
+    Magick::Quantum* q = image.getPixels(0, 0, image.columns(), image.rows());
+
+    for (Pixel p : pixels) {
+        writeColor(p, q);
+    }
+
+    image.syncPixels();
+}
+
+void PixelSort::ApplyMatcher(PixelVector& pixels, const PixelSort::Matcher& matcher) {
+    pixels.erase(
+        std::remove_if(pixels.begin(), pixels.end(), matcher),
+        pixels.end());
+}
+
+void PixelSort::Sort(PixelVector& pixels,
+                     const PixelSort::PixelComparator& comp) {
+    std::stable_sort(pixels.begin(), pixels.end(), comp);
+}
+
+/*
 void sortPixels(Magick::Image& image, int x, int y, int runWidth, int runLength,
         ColorMatcher &cm, ColorTransformer &ct,
         SortDirection SDx, SortDirection SDy, OuterLoop ol)
@@ -150,3 +191,4 @@ void sortPixelBlocks(Magick::Image& image, int borderx, int bordery,
         }
     }
 }
+*/
