@@ -7,6 +7,9 @@ PixelSort::ColorCoordinate::ColorCoordinate(const PixelSort::Coordinate& coord,
     const Magick::ColorRGB& color):
     Coordinate(coord), Magick::ColorRGB(color) {};
 
+PixelSort::ColorCoordinate::ColorCoordinate():
+    Coordinate(0, 0), Magick::ColorRGB(0, 0, 0) {};
+
 PixelSort::BoxCoordinate::BoxCoordinate(int x, int y, int width, int height)
         :Coordinate(x, y), width(width), height(height) {};
 

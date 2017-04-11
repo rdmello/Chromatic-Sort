@@ -23,6 +23,7 @@ namespace PixelSort {
 
     /* Store x, y coordinates with Magick::Color in a convenient way */
     struct ColorCoordinate : public Coordinate, public Magick::ColorRGB {
+        ColorCoordinate();
         ColorCoordinate(const Coordinate& coord, const Magick::ColorRGB& color);
     };
 

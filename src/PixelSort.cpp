@@ -7,34 +7,6 @@ void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
     *(location+2) = color.quantumBlue();
 }
 
-/*
-void colorPixels(Magick::Image& image, int x, int y, int runWidth, int runLength) {
-    int width = runWidth;
-    int height = runLength;
-
-    image.modifyImage();
-    image.type(Magick::TrueColorType);
-
-    // FORCE COPY of data
-    // image.pixelColor(100, 100, image.pixelColor(100, 100));
-    Magick::Quantum* pixels = image.getPixels(x, y, width, height);
-    // std::cout << "Num channels: " << image.channels() << std::endl;
-
-    for (int j = 0; j < height; ++j) {
-        for (int i = 0; i < 3*width; i = i + 3) {
-            int idx = i + (j * 3 * width);
-            // std::cout << i << " " << j << " " << idx << std::endl;
-            Magick::Color color(pixels[idx], pixels[idx+1], pixels[idx+2]);
-            Magick::ColorYUV myColor(color);
-            myColor.u(myColor.v() + 0.3);
-            myColor.v(myColor.u() + 0.3);
-            writeColor(myColor, &pixels[idx]);
-        }
-    }
-    image.syncPixels();
-}
-*/
-
 void PixelSort::readImageToPixelVector(Magick::Image& image, PixelVector& pixels) {
     image.modifyImage();
     image.type(Magick::TrueColorType);
@@ -58,15 +30,15 @@ void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image
     Magick::Quantum* q = image.getPixels(0, 0, image.columns(), image.rows());
 
     for (Pixel p : pixels) {
-        writeColor(p, q);
+        writeColor(p, &q[(3*p.x)+(3*p.y*image.columns())]);
     }
 
     image.syncPixels();
 }
 
-void PixelSort::ApplyMatcher(PixelVector& pixels, const PixelSort::Matcher& matcher) {
+void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher matcher) {
     pixels.erase(
-        std::remove_if(pixels.begin(), pixels.end(), matcher),
+        std::remove_if(pixels.begin(), pixels.end(), [&](const Pixel& pixel) {return !matcher(pixel);}),
         pixels.end());
 }
 
