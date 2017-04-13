@@ -52,7 +52,7 @@ void doREPL(Magick::Image& image) {
 //         pixel.red(1);
 //     });
 
-    for(int i = 0; i < 2906; i+=100) {
+    for(int i = 0; i < 2906; i+=10) {
         PixelSort::PixelVector rowPixels(10 * image.columns());
         std::copy_if(pixels.begin(), pixels.end(), rowPixels.begin(),
             [=](const PixelSort::Pixel& pixel){return (pixel.y >= i) && (pixel.y < i + 10);});
