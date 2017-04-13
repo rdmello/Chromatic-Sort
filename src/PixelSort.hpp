@@ -26,7 +26,7 @@ namespace PixelSort {
     void ApplyMatcher(PixelVector& pixels, Matcher matcher);
 
     /* Simple Sort pixels */
-    void Sort(PixelVector& pixels, const PixelComparator& comp);
+    void Sort(PixelVector& pixels, PixelComparator comp);
 
     /* writeColor is a utility function to help convert and write
      * a Magick::Color to a Quantum triplet

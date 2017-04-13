@@ -48,11 +48,31 @@ void doREPL(Magick::Image& image) {
     // PixelSort::ApplyMatcher(pixels, matcher);
     // std::cout << "Applied matcher " << pixels.size() << std::endl;
 
-    std::for_each(pixels.begin(), pixels.end(), [](PixelSort::Pixel& pixel){
-        pixel.red(1);
-    });
+//     std::for_each(pixels.begin(), pixels.end(), [](PixelSort::Pixel& pixel){
+//         pixel.red(1);
+//     });
+
+    for(int i = 0; i < 2906; i+=100) {
+        PixelSort::PixelVector rowPixels(10 * image.columns());
+        std::copy_if(pixels.begin(), pixels.end(), rowPixels.begin(),
+            [=](const PixelSort::Pixel& pixel){return (pixel.y >= i) && (pixel.y < i + 10);});
+        PixelSort::PixelVector rowPixels_orig(image.columns());
+        rowPixels_orig = rowPixels;
+
+        std::cout << "sorting " << i << " num: " << rowPixels.size() << std::endl;
+        PixelSort::Sort(rowPixels, PixelSort::SumPixelComparator());
+
+        PixelSort::PixelVector::iterator j = rowPixels_orig.begin();
+        for(auto i = rowPixels.begin(); i != rowPixels.end(); ++i){
+            j->red(i->red());
+            j->blue(i->blue());
+            j->green(i->green());
+            ++j;
+        }
+        PixelSort::writePixelVectorToImage(rowPixels_orig, image);
+    }
 
     /* Update image */
-    PixelSort::writePixelVectorToImage(pixels, image);
+    // PixelSort::writePixelVectorToImage(pixels, image);
     std::cout << "Wrote image" << std::endl;
 }

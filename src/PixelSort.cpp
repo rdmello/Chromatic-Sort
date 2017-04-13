@@ -29,7 +29,7 @@ void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image
     image.type(Magick::TrueColorType);
     Magick::Quantum* q = image.getPixels(0, 0, image.columns(), image.rows());
 
-    for (Pixel p : pixels) {
+    for (const Pixel& p : pixels) {
         writeColor(p, &q[(3*p.x)+(3*p.y*image.columns())]);
     }
 
@@ -38,12 +38,13 @@ void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image
 
 void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher matcher) {
     pixels.erase(
-        std::remove_if(pixels.begin(), pixels.end(), [&](const Pixel& pixel) {return !matcher(pixel);}),
-        pixels.end());
+        std::remove_if(pixels.begin(), pixels.end(), [&](const Pixel& pixel) {
+            return !matcher(pixel);
+        }), pixels.end());
 }
 
 void PixelSort::Sort(PixelVector& pixels,
-                     const PixelSort::PixelComparator& comp) {
+                     PixelSort::PixelComparator comp) {
     std::stable_sort(pixels.begin(), pixels.end(), comp);
 }
 
