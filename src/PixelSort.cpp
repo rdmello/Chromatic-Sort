@@ -36,7 +36,7 @@ void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image
     image.syncPixels();
 }
 
-void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher matcher) {
+void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher& matcher) {
     pixels.erase(
         std::remove_if(pixels.begin(), pixels.end(), [&](const Pixel& pixel) {
             return !matcher(pixel);

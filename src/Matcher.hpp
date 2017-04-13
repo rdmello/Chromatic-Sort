@@ -28,6 +28,15 @@ namespace PixelSort {
         BoxCoordinate bounds;
     };
 
+    /* Matches if ColorCoordinate within Circle */
+    struct CircleMatcher : public Matcher {
+        CircleMatcher(Coordinate center, double radius);
+        virtual bool operator()(const Pixel& pixel);
+    private:
+        Coordinate center;
+        double radius;
+    };
+
     /*
      * ColorMatcher defines a function 'match' which selects pixels
      * from the input image that matches conditions

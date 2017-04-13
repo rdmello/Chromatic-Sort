@@ -1,4 +1,6 @@
 
+#include <cmath>
+
 #include "Matcher.hpp"
 
 bool PixelSort::Matcher::operator() (const PixelSort::Pixel &pixel) {
@@ -16,6 +18,15 @@ bool PixelSort::RectangleMatcher::operator()(const Pixel &pixel) {
     } else {
         return false;
     }
+}
+
+PixelSort::CircleMatcher::CircleMatcher(Coordinate center, double radius): center(center), radius(radius) {};
+
+bool PixelSort::CircleMatcher::operator()(const Pixel &pixel) {
+    double xdiff = std::abs(double(pixel.x - center.x));
+    double ydiff = std::abs(double(pixel.y - center.y));
+    double length = std::sqrt((xdiff*xdiff) + (ydiff*ydiff));
+    return length < radius;
 }
 
 bool PixelSort::ColorMatcher::operator() (const Magick::ColorRGB &color) {

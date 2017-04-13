@@ -23,7 +23,7 @@ namespace PixelSort {
     void writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image);
 
     /* Apply matcher */
-    void ApplyMatcher(PixelVector& pixels, Matcher matcher);
+    void ApplyMatcher(PixelVector& pixels, Matcher& matcher);
 
     /* Simple Sort pixels */
     void Sort(PixelVector& pixels, PixelComparator comp);
