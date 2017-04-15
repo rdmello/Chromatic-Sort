@@ -31,24 +31,34 @@ int main() {
     int h = 50;
     for (int j(0); j < image.rows(); j+=h) {
         for (int i(0); i < image.columns(); i+=w) {
-            PixelVector pv;
+            /* Define region-of-interest and make PixelVector */
             BoundedCoordinate box(i, j, w, h, image.columns(), image.rows());
-            read(pv, image, box);
-            
-            PixelVector p_sort = pv;
-            std::stable_sort(p_sort.begin(),p_sort.end(), 
-                [&](const Pixel& p1, const Pixel& p2) {
-                    return p1.red() < p2.red();
-                });
-            
-            std::transform(pv.begin(), pv.end(), p_sort.begin(), pv.begin(), 
-                [&](const Pixel& p1, const Pixel& p2) {
-                    Pixel p = p1; 
-                    p.red(p2.red());
-                    return p;
-                });
+            PixelVector pv(image, box);
 
-            write(pv, image, box);
+            /* Change sort direction to work in the y-direction */
+            pv.sort([](const Pixel& p1, const Pixel& p2) {
+                return p1.x < p2.x;
+            });
+
+            /* Define and apply a circular matcher */
+            CircleMatcher mat(Coordinate(i+(w/2), j+(h/2)), 15);
+            pv.match(mat);
+
+            /* Sort the vector into a new vector */
+            PixelVector pv2 = pv;
+            pv2.sort([](const Pixel& p1, const Pixel& p2) {
+                return p1.red() < p2.red();
+            });
+
+            /* Combine the new sorted vector into the unsorted one */ 
+            pv.apply(pv2, [](const Pixel& p1, const Pixel& p2) {
+                Pixel p = p1;
+                p.red(p2.red());
+                return p;
+            });
+
+            /* Write to image */
+            pv.sync();
         }
     }
     

@@ -43,7 +43,7 @@ namespace PixelSort {
     using Pixel = PixelSort::ColorCoordinate;
 
     /* Main storage type */
-    using PixelVector = std::vector<Pixel>;
+    // using PixelVector = std::vector<Pixel>;
 
 }
 

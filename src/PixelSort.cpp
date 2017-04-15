@@ -1,11 +1,7 @@
 
 #include "PixelSort.hpp"
 
-void PixelSort::read(PixelVector& pixels, const Magick::Image& image) {
-    read(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows()));
-}
-
-void PixelSort::read(PixelVector& pixels, const Magick::Image& image, const BoxCoordinate& box) {
+PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box): image{image}, box{box} {
     const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
     for(int j = 0; j < box.height; ++j) {
@@ -19,11 +15,7 @@ void PixelSort::read(PixelVector& pixels, const Magick::Image& image, const BoxC
     }
 }
 
-void PixelSort::write(const PixelVector& pixels, Magick::Image& image) {
-    write(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows())); 
-}
-
-void PixelSort::write(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box) {
+void PixelSort::PixelVector::sync() {
     image.modifyImage();
     Magick::Quantum* q = image.getPixels(box.x, box.y, box.width, box.height);
 
@@ -34,23 +26,47 @@ void PixelSort::write(const PixelVector& pixels, Magick::Image& image, const Box
     image.syncPixels();
 }
 
-template <typename T>
-void PixelSort::match(PixelVector& pixels, T matcher) {
+/* MATCH FUNCTION */
+void PixelSort::PixelVector::match(PixelSort::Matcher& matcher) {
+    pixels.erase(std::remove_if(pixels.begin(), pixels.end(), 
+        [&](const Pixel& pixel) {
+            return !matcher(pixel);
+        }), pixels.end());
+}
+void PixelSort::PixelVector::match(bool (*matcher)(const PixelSort::Pixel&)) {
     pixels.erase(std::remove_if(pixels.begin(), pixels.end(), 
         [&](const Pixel& pixel) {
             return !matcher(pixel);
         }), pixels.end());
 }
 
-/* Explicit instantiations */
-template void PixelSort::match<PixelSort::Matcher>(PixelSort::PixelVector& pixels, PixelSort::Matcher matcher);
-template void PixelSort::match<bool (*)(const PixelSort::Pixel&)>(PixelSort::PixelVector& pixels, bool (*matcher)(const PixelSort::Pixel&));
-
-void PixelSort::sort(PixelVector& pixels,
-                     PixelSort::PixelComparator comp) {
-    std::stable_sort(pixels.begin(), pixels.end(), comp);
+/* STABLE SORT */
+void PixelSort::PixelVector::sort(const PixelSort::PixelComparator& comparator) {
+    std::stable_sort(pixels.begin(), pixels.end(), comparator);
+}
+void PixelSort::PixelVector::sort(bool (*comparator)(const PixelSort::Pixel&, const PixelSort::Pixel&)) {
+    std::stable_sort(pixels.begin(), pixels.end(), comparator);
 }
 
+/* UNSTABLE SORT */ 
+void PixelSort::PixelVector::unstable_sort(const PixelSort::PixelComparator& comparator) {
+    std::sort(pixels.begin(), pixels.end(), comparator);
+}
+void PixelSort::PixelVector::unstable_sort(bool (*comparator)(const PixelSort::Pixel&, const PixelSort::Pixel&)) {
+    std::sort(pixels.begin(), pixels.end(), comparator);
+}
+
+/* APPLY */
+void PixelSort::PixelVector::apply(void (*func)(PixelSort::Pixel&)) {
+    for(PixelSort::Pixel& p: pixels) {
+        func(p);
+    }
+}
+void PixelSort::PixelVector::apply(const PixelSort::PixelVector& pv, PixelSort::Pixel (*func)(const PixelSort::Pixel&, const PixelSort::Pixel&)) {
+    std::transform(pixels.begin(), pixels.end(), pv.pixels.begin(), pixels.begin(), func);
+}
+
+/* utility function */
 void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
     *location = color.quantumRed();
     *(location+1) = color.quantumGreen();

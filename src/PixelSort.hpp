@@ -17,22 +17,42 @@
 
 namespace PixelSort {
 
-    /* reading Image into sortable type */
-    void read(PixelVector& pixels, const Magick::Image& image);
-    void read(PixelVector& pixels, const Magick::Image& image, const BoxCoordinate& box);
+    /* PixelVector is the main class which maintains a vector of Pixel objects
+     * and provides a set of methods to update pixels and keep them in sync
+     * with the Magick::Image object
+     */
+    class PixelVector {
+        private:
+            Magick::Image& image;
+            BoxCoordinate box;
+            std::vector<Pixel> pixels;
+        
+        public:
+            /* CONSTRUCTOR reading Image into sortable type */
+            PixelVector(Magick::Image& image, const BoxCoordinate& box); 
 
-    /* write sortable type into Image */
-    void write(const PixelVector& pixels, Magick::Image& image);
-    void write(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box);
+            /* Writes PixelVector to Magick::Image */
+            void sync();
+    
+            /* Apply matcher 
+            * MatcherFunc must be a PixelSort::Matcher, or a function 
+            * which transforms a const PixelSort::Pixel& to a bool */
+            // void match(const Matcher& matcher);
+            void match(Matcher& matcher);
+            void match(bool (*matcher)(const Pixel&));
 
-    /* Apply matcher 
-     * MatcherFunc must be a PixelSort::Matcher, or a function 
-     * which transforms a const PixelSort::Pixel& to a bool */
-    template <typename MatcherFunc>
-    void match(PixelVector& pixels, MatcherFunc func);
-
-    /* Simple Sort pixels */
-    void sort(PixelVector& pixels, PixelComparator comp);
+            /* Simple Sort pixels */
+            void sort(const PixelComparator& comparator);
+            void sort(bool (*comparator)(const Pixel&, const Pixel&));
+            
+            /* Unstable Sort pixels */
+            void unstable_sort(const PixelComparator& comparator);
+            void unstable_sort(bool (*comparator)(const Pixel&, const Pixel&));
+ 
+            /* Apply unary/binary function on this PixelVector */
+            void apply(void (*func)(Pixel& p));
+            void apply(const PixelVector&, Pixel (*func)(const Pixel& p1, const Pixel& p2));
+    };
 
     /* writeColor is a utility function to help convert and write
      * a Magick::Color to a Quantum triplet
