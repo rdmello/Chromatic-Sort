@@ -4,6 +4,7 @@
  */
 
 #include <vector>
+#include <iostream>
 
 #include <Magick++.h>
 
@@ -17,10 +18,12 @@
 namespace PixelSort {
 
     /* reading Image into sortable type */
-    void readImageToPixelVector(Magick::Image& image, PixelVector& pixels);
+    void readImageToPixelVector(const Magick::Image& image, PixelVector& pixels);
+    void readImageToPixelVector(const Magick::Image& image, PixelVector& pixels, const BoxCoordinate& box);
 
     /* write sortable type into Image */
     void writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image);
+    void writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box);
 
     /* Apply matcher */
     void ApplyMatcher(PixelVector& pixels, Matcher& matcher);

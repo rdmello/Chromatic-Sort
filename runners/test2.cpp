@@ -34,81 +34,44 @@ int main () {
     doREPL(img);
 
     img.write(fileout);
+    std::cout << "Written image" << std::endl;
     return 0;
 }
 
 void doREPL(Magick::Image& image) {
-    /* Define pixel array and populate */
-    PixelSort::PixelVector pixels;
-    PixelSort::readImageToPixelVector(image, pixels);
-    std::cout << "Read image " << pixels.size() << std::endl;
-
-    /* Run matcher workflow */
-//    PixelSort::RectangleMatcher matcher(PixelSort::BoxCoordinate(100, 100, 200, 200));
-//    PixelSort::ApplyMatcher(pixels, matcher);
-//    std::cout << "Applied matcher " << pixels.size() << std::endl;
-//
-//    std::for_each(pixels.begin(), pixels.end(), [](PixelSort::Pixel& pixel){
-//      pixel.red(1);
-//    });
-//
-
-    int xp = 200;
-    int yp = 200;
+    image.modifyImage();
+    image.type(Magick::TrueColorType);
+    int xp = 50;
+    int yp = 50;
     for(int j = 0; j < image.rows(); j+=yp) {
-        std::cout << "sorting " << j << std::endl;
+        std::cout << "sorting " << j << "/" << image.rows() << std::endl;
+        
         for(int i = 0; i < image.columns(); i+=xp) {
-            PixelSort::BoundedCoordinate myCoords(i, j, xp, yp, image.columns(), image.rows());
-            PixelSort::PixelVector rowPixels( myCoords.width*myCoords.height );
-            PixelSort::RectangleMatcher mat(myCoords);
-            PixelSort::CircleMatcher circ(PixelSort::Coordinate(i+(xp/2), j+(yp/2)), 90);
 
-            std::copy_if(pixels.begin(), pixels.end(), rowPixels.begin(), mat);
+            /* Set up coordinates */ 
+            PixelSort::BoundedCoordinate myCoords(i, j, xp, yp, image.columns(), image.rows());
+
+            /* Generate rowPixels */
+            PixelSort::PixelVector rowPixels;
+            PixelSort::readImageToPixelVector(image, rowPixels, myCoords);
+
+            /* Matchers */
+            PixelSort::CircleMatcher circ(PixelSort::Coordinate(i+(xp/2), j+(yp/2)), 20);
             PixelSort::ApplyMatcher(rowPixels, circ);
 
+            /* Sort pixels */
             PixelSort::PixelVector rowPixels_sort = rowPixels;
-            PixelSort::PixelVector rowPixels_orig = rowPixels;
-            PixelSort::Sort(rowPixels_sort, PixelSort::SumPixelComparator());
+            std::sort(rowPixels_sort.begin(), rowPixels_sort.end(), PixelSort::SumPixelComparator());
 
-            PixelSort::PixelVector::iterator j = rowPixels_orig.begin();
-            for(auto i = rowPixels_sort.begin(); i != rowPixels_sort.end(); ++i){
-                j->red(i->red());
-                // j->blue(i->blue());
-                // j->green(i->green());
-                ++j;
-            }
-            PixelSort::writePixelVectorToImage(rowPixels_orig, image);
+            /* Transform output arrays */
+            std::transform(
+                rowPixels.begin(), rowPixels.end(), rowPixels_sort.begin(), rowPixels.begin(), 
+                [&](PixelSort::Pixel p1, PixelSort::Pixel p2){
+                    return PixelSort::Pixel(p1, p2);
+                });
+
+            /* Write pixelvector to image */
+            PixelSort::writePixelVectorToImage(rowPixels, image, myCoords);
         }
     }
-    xp = 100;
-    yp = 100;
-    for(int j = 0; j < image.rows(); j+=yp) {
-        std::cout << "sorting " << j << std::endl;
-        for(int i = 0; i < image.columns(); i+=xp) {
-            PixelSort::BoundedCoordinate myCoords(i, j, xp, yp, image.columns(), image.rows());
-            PixelSort::PixelVector rowPixels( myCoords.width*myCoords.height );
-            PixelSort::RectangleMatcher mat(myCoords);
-            PixelSort::CircleMatcher circ(PixelSort::Coordinate(i+(xp/2), j+(yp/2)), 30);
-
-            std::copy_if(pixels.begin(), pixels.end(), rowPixels.begin(), mat);
-            PixelSort::ApplyMatcher(rowPixels, circ);
-
-            PixelSort::PixelVector rowPixels_sort = rowPixels;
-            PixelSort::PixelVector rowPixels_orig = rowPixels;
-            PixelSort::Sort(rowPixels_sort, PixelSort::SumPixelComparator());
-
-            PixelSort::PixelVector::iterator j = rowPixels_orig.begin();
-            for(auto i = rowPixels_sort.begin(); i != rowPixels_sort.end(); ++i){
-                j->red(i->red());
-                j->blue(i->blue());
-                j->green(i->green());
-                ++j;
-            }
-            PixelSort::writePixelVectorToImage(rowPixels_orig, image);
-        }
-    }
-
-    /* Update image */
-    // PixelSort::writePixelVectorToImage(pixels, image);
-    std::cout << "Wrote image" << std::endl;
 }

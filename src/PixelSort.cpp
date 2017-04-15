@@ -7,38 +7,43 @@ void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
     *(location+2) = color.quantumBlue();
 }
 
-void PixelSort::readImageToPixelVector(Magick::Image& image, PixelVector& pixels) {
-    image.modifyImage();
-    image.type(Magick::TrueColorType);
-    Magick::Quantum* a = image.getPixels(0, 0, image.columns(), image.rows());
-    int width = image.columns();
+void PixelSort::readImageToPixelVector(const Magick::Image& image, PixelVector& pixels) {
+    readImageToPixelVector(image, pixels, BoxCoordinate(0, 0, image.columns(), image.rows()));
+}
 
-    for(int j = 0; j < image.rows(); ++j) {
-        for(int i = 0; i < 3 * image.columns(); i += 3) {
-            int idx = i + (j * 3 * width);
+void PixelSort::readImageToPixelVector(const Magick::Image& image, PixelVector& pixels, const BoxCoordinate& box) {
+    
+    const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
+
+    for(int j = 0; j < box.height; ++j) {
+        for(int i = 0; i < 3 * box.width; i += 3) {
+            int idx = i + (j * 3 * box.width);
             Magick::Color color(a[idx], a[idx+1], a[idx+2]);
             Magick::ColorRGB rgbColor(color);
-            Coordinate coord(i/3, j);
+            Coordinate coord(box.x + (i/3), box.y + j);
             pixels.push_back(Pixel(coord, color));
         }
     }
 }
 
 void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image) {
+    writePixelVectorToImage(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows()));    
+}
+
+void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box) {
     image.modifyImage();
-    image.type(Magick::TrueColorType);
-    Magick::Quantum* q = image.getPixels(0, 0, image.columns(), image.rows());
+    Magick::Quantum* q = image.getPixels(box.x, box.y, box.width, box.height);
 
     for (const Pixel& p : pixels) {
-        writeColor(p, &q[(3*p.x)+(3*p.y*image.columns())]);
+        writeColor(p, &q[(3*(p.x-box.x))+(3*(p.y-box.y)*box.width)]);
     }
 
     image.syncPixels();
 }
 
 void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher& matcher) {
-    pixels.erase(
-        std::remove_if(pixels.begin(), pixels.end(), [&](const Pixel& pixel) {
+    pixels.erase(std::remove_if(pixels.begin(), pixels.end(), 
+        [&](const Pixel& pixel) {
             return !matcher(pixel);
         }), pixels.end());
 }

@@ -40,10 +40,10 @@ namespace PixelSort {
     };
 
     /* We'll be using Pixel a lot */
-    typedef PixelSort::ColorCoordinate Pixel;
+    using Pixel = PixelSort::ColorCoordinate;
 
     /* Main storage type */
-    typedef std::vector<Pixel> PixelVector;
+    using PixelVector = std::vector<Pixel>;
 
 }
 
