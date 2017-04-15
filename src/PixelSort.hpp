@@ -18,18 +18,21 @@
 namespace PixelSort {
 
     /* reading Image into sortable type */
-    void readImageToPixelVector(const Magick::Image& image, PixelVector& pixels);
-    void readImageToPixelVector(const Magick::Image& image, PixelVector& pixels, const BoxCoordinate& box);
+    void read(PixelVector& pixels, const Magick::Image& image);
+    void read(PixelVector& pixels, const Magick::Image& image, const BoxCoordinate& box);
 
     /* write sortable type into Image */
-    void writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image);
-    void writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box);
+    void write(const PixelVector& pixels, Magick::Image& image);
+    void write(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box);
 
-    /* Apply matcher */
-    void ApplyMatcher(PixelVector& pixels, Matcher& matcher);
+    /* Apply matcher 
+     * MatcherFunc must be a PixelSort::Matcher, or a function 
+     * which transforms a const PixelSort::Pixel& to a bool */
+    template <typename MatcherFunc>
+    void match(PixelVector& pixels, MatcherFunc func);
 
     /* Simple Sort pixels */
-    void Sort(PixelVector& pixels, PixelComparator comp);
+    void sort(PixelVector& pixels, PixelComparator comp);
 
     /* writeColor is a utility function to help convert and write
      * a Magick::Color to a Quantum triplet

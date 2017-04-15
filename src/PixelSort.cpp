@@ -1,18 +1,11 @@
 
 #include "PixelSort.hpp"
 
-void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
-    *location = color.quantumRed();
-    *(location+1) = color.quantumGreen();
-    *(location+2) = color.quantumBlue();
+void PixelSort::read(PixelVector& pixels, const Magick::Image& image) {
+    read(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows()));
 }
 
-void PixelSort::readImageToPixelVector(const Magick::Image& image, PixelVector& pixels) {
-    readImageToPixelVector(image, pixels, BoxCoordinate(0, 0, image.columns(), image.rows()));
-}
-
-void PixelSort::readImageToPixelVector(const Magick::Image& image, PixelVector& pixels, const BoxCoordinate& box) {
-    
+void PixelSort::read(PixelVector& pixels, const Magick::Image& image, const BoxCoordinate& box) {
     const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
     for(int j = 0; j < box.height; ++j) {
@@ -26,11 +19,11 @@ void PixelSort::readImageToPixelVector(const Magick::Image& image, PixelVector& 
     }
 }
 
-void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image) {
-    writePixelVectorToImage(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows()));    
+void PixelSort::write(const PixelVector& pixels, Magick::Image& image) {
+    write(pixels, image, BoxCoordinate(0, 0, image.columns(), image.rows())); 
 }
 
-void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box) {
+void PixelSort::write(const PixelVector& pixels, Magick::Image& image, const BoxCoordinate& box) {
     image.modifyImage();
     Magick::Quantum* q = image.getPixels(box.x, box.y, box.width, box.height);
 
@@ -41,132 +34,26 @@ void PixelSort::writePixelVectorToImage(const PixelVector& pixels, Magick::Image
     image.syncPixels();
 }
 
-void PixelSort::ApplyMatcher(PixelVector& pixels, PixelSort::Matcher& matcher) {
+template <typename T>
+void PixelSort::match(PixelVector& pixels, T matcher) {
     pixels.erase(std::remove_if(pixels.begin(), pixels.end(), 
         [&](const Pixel& pixel) {
             return !matcher(pixel);
         }), pixels.end());
 }
 
-void PixelSort::Sort(PixelVector& pixels,
+/* Explicit instantiations */
+template void PixelSort::match<PixelSort::Matcher>(PixelSort::PixelVector& pixels, PixelSort::Matcher matcher);
+template void PixelSort::match<bool (*)(const PixelSort::Pixel&)>(PixelSort::PixelVector& pixels, bool (*matcher)(const PixelSort::Pixel&));
+
+void PixelSort::sort(PixelVector& pixels,
                      PixelSort::PixelComparator comp) {
     std::stable_sort(pixels.begin(), pixels.end(), comp);
 }
 
-/*
-void sortPixels(Magick::Image& image, int x, int y, int runWidth, int runLength,
-        ColorMatcher &cm, ColorTransformer &ct,
-        SortDirection SDx, SortDirection SDy, OuterLoop ol)
-{
-    int width = runWidth;
-    int height = runLength;
-
-    image.modifyImage();
-    image.type(Magick::TrueColorType);
-
-    Magick::Quantum* pixels = image.getPixels(x, y, width, height);
-    double *rowArr = new double[height * width];
-    size_t k1 = 0;
-
-    int olInit = 0;
-    int olTerm = height;
-    int olStep = 1;
-
-    int ilInit = 0;
-    int ilTerm = 3*width;
-    int ilStep = 3;
-
-
-    if (ol == OuterLoop::X) {
-        olInit = 0;
-        olTerm = 3 * width;
-        olStep = 3;
-
-        ilInit = 0;
-        ilTerm = height;
-        ilStep = 1;
-    }
-
-    if (SDx == SortDirection::Dec) {
-        if (ol == OuterLoop::Y) {
-            int temp = ilInit;
-            ilInit = ilTerm - ilStep;
-            ilTerm = temp - ilStep;
-            ilStep *= -1;
-        } else {
-            int temp = olInit;
-            olInit = olTerm - olStep;
-            olTerm = temp - olStep;
-            olStep *= -1;
-        }
-    }
-
-    if (SDy == SortDirection::Dec) {
-        if (ol == OuterLoop::X) {
-            int temp = ilInit;
-            ilInit = ilTerm - ilStep;
-            ilTerm = temp - ilStep;
-            ilStep *= -1;
-        } else {
-            int temp = olInit;
-            olInit = olTerm - olStep;
-            olTerm = temp - olStep;
-            olStep *= -1;
-        }
-    }
-
-    for (int j = olInit; j != olTerm; j += olStep) {
-        for (int i = ilInit; i != ilTerm; i += ilStep) {
-            size_t idx = (ol==OuterLoop::Y) ? i + (j * 3 * width) : j + (i * 3 * width);
-            Magick::Color color(pixels[idx], pixels[idx+1], pixels[idx+2]);
-            Magick::ColorRGB myColor(color);
-            if (cm.match(myColor)) {
-                Coordinate myCoord(i, j);
-                rowArr[k1] = ct.transform(myColor, myCoord);
-                ++k1;
-            }
-        }
-    }
-
-    if (k1 > 0) {
-        std::sort(rowArr, rowArr+k1-1);
-    }
-
-    ct.reset();
-
-    size_t k2 = 0;
-    for (int j = olInit; j != olTerm; j += olStep) {
-        for (int i = ilInit; i != ilTerm; i += ilStep) {
-            size_t idx = (ol==OuterLoop::Y) ? i + (j * 3 * width) : j + (i * 3 * width);
-            Magick::Color color(pixels[idx], pixels[idx+1], pixels[idx+2]);
-            Magick::ColorRGB myColor(color);
-            if (cm.match(myColor)) {
-                Coordinate myCoord(i, j);
-                ct.inv_transform(myColor, myCoord, rowArr[k2]);
-                writeColor(myColor, &pixels[idx]);
-                ++k2;
-            }
-        }
-    }
-
-    image.syncPixels();
-    delete [] rowArr;
+void PixelSort::writeColor(Magick::Color color, Magick::Quantum* location) {
+    *location = color.quantumRed();
+    *(location+1) = color.quantumGreen();
+    *(location+2) = color.quantumBlue();
 }
 
-void sortPixelBlocks(Magick::Image& image, int borderx, int bordery,
-                        int borderwidth, int borderheight,
-                        int x, int y, int runWidth, int runHeight,
-                        ColorMatcher &cm, ColorTransformer &ct,
-                        SortDirection sx, SortDirection sy, OuterLoop ol)
-{
-    for (int i = x; i < borderwidth; i = i + runWidth) {
-        for (int j = y; j < borderheight; j = j + runHeight) {
-            int newWidth = i + runWidth > image.columns() ? image.columns() - i : runWidth;
-            int newHeight = j + runHeight > image.rows() ? image.rows() - j : runHeight;
-            // std::cout << i << ", " << j << std::endl;
-            ct.reset();
-            sortPixels(image, i, j, newWidth, newHeight, cm, ct, sx, sy, ol);
-        }
-    }
-}
-*/
