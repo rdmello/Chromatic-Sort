@@ -36,6 +36,7 @@ namespace PixelSort {
     struct BoundedCoordinate : public BoxCoordinate {
         int max_x, max_y;
         BoundedCoordinate(int x, int y, int width, int height, int max_x, int max_y);
+        BoundedCoordinate(BoxCoordinate box, int max_x, int max_y);
         void clampToMax(int max_x, int max_y);
     };
 

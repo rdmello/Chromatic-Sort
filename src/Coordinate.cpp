@@ -18,6 +18,11 @@ PixelSort::BoundedCoordinate::BoundedCoordinate(int x, int y,
         :BoxCoordinate(x, y, width, height), max_x(max_x), max_y(max_y) {
     clampToMax(max_x, max_y);
 }
+PixelSort::BoundedCoordinate::BoundedCoordinate(PixelSort::BoxCoordinate box, 
+    int max_x, int max_y)
+        :BoxCoordinate(box), max_x(max_x), max_y(max_y) {
+    clampToMax(max_x, max_y);
+}
 
 void PixelSort::BoundedCoordinate::clampToMax(int max_x, int max_y) {
     this->max_x = max_x;

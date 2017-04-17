@@ -25,11 +25,12 @@ namespace PixelSort {
         private:
             Magick::Image& image;
             BoxCoordinate box;
-            std::vector<Pixel> pixels;
-        
         public:
+
+            std::vector<Pixel> pixels;
             /* CONSTRUCTOR reading Image into sortable type */
             PixelVector(Magick::Image& image, const BoxCoordinate& box); 
+            PixelVector(const PixelVector& pv, int start, int end);
 
             /* Writes PixelVector to Magick::Image */
             void sync();

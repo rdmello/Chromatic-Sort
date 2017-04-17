@@ -1,7 +1,8 @@
 
 #include "PixelSort.hpp"
 
-PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box): image{image}, box{box} {
+PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)
+    : image{image}, box{BoundedCoordinate(box, image.columns(), image.rows())} {
     const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
     for(int j = 0; j < box.height; ++j) {
@@ -13,6 +14,13 @@ PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& b
             pixels.push_back(Pixel(coord, color));
         }
     }
+}
+
+PixelSort::PixelVector::PixelVector(const PixelVector& pv, int start, int end)
+    : image(pv.image), box(pv.box) {
+    std::vector<Pixel>::const_iterator first = pv.pixels.begin() + start;
+    std::vector<Pixel>::const_iterator last = pv.pixels.begin() + end;
+    pixels = std::vector<Pixel>(first, last);
 }
 
 void PixelSort::PixelVector::sync() {
