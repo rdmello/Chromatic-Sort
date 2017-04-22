@@ -1,8 +1,46 @@
 
 #include "PixelSort.hpp"
 
-PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)
+PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box, const GeometryMatcher& matcher)
     : image{image}, box{BoundedCoordinate(box, image.columns(), image.rows())} {
+
+    for (int j = 0; j < box.height; ++j) {
+        for (int i = 0; i < box.width; ++i) {
+            Pixel coord(Coordinate(i, j), Magick::ColorRGB(0, 0, 0));
+            if (matcher(coord)) {
+                pixels.push_back(coord);
+            }
+        }
+    }
+    
+    const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
+
+   for (Pixel& p : pixels) {
+        int idx = 3*(p.x + p.y*box.width);
+        Magick::Color color(a[idx], a[idx+1], a[idx+2]);
+        Magick::ColorRGB rgbColor(color);
+        p.red(rgbColor.red());
+        p.green(rgbColor.green());
+        p.blue(rgbColor.blue());
+    }
+/*
+    for(int j = 0; j < box.height; ++j) {
+        for(int i = 0; i < 3 * box.width; i += 3) {
+            int idx = i + (j * 3 * box.width);
+            Magick::Color color(a[idx], a[idx+1], a[idx+2]);
+            Magick::ColorRGB rgbColor(color);
+            // Coordinate coord(box.x + (i/3), box.y + j);
+            Coordinate coord(i/3, j);
+            pixels.push_back(Pixel(coord, color));
+        }
+    }
+*/
+ }
+
+PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)
+    // : PixelVector(image, box, GeometryMatcher()) {
+    : image{image}, box{BoundedCoordinate(box, image.columns(), image.rows())} {
+    
     const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
     for(int j = 0; j < box.height; ++j) {
@@ -21,6 +59,11 @@ PixelSort::PixelVector::PixelVector(const PixelVector& pv, int start, int end)
     : image(pv.image), box(pv.box) {
     std::vector<Pixel>::const_iterator first = pv.pixels.begin() + start;
     std::vector<Pixel>::const_iterator last = pv.pixels.begin() + end;
+    pixels = std::vector<Pixel>(first, last);
+}
+
+PixelSort::PixelVector::PixelVector(const PixelVector& pv, std::vector<Pixel>::iterator first,                                                std::vector<Pixel>::iterator last)
+    : image(pv.image), box(pv.box) {
     pixels = std::vector<Pixel>(first, last);
 }
 
@@ -126,6 +169,52 @@ template void PixelSort::BlockPixelSort(Magick::Image& image,
 template void PixelSort::BlockPixelSort(Magick::Image& image, 
     Coordinate blocksize, const MatchFcn& mat, const CompareFcn& comp, 
     const ApplyFcn& applyfcn);
+
+/* ASENDORFSORT TEMPLATE
+ * template declaration and instantiations for AsendorfSort
+ */
+template <typename T1, typename T2>
+void PixelSort::AsendorfSort(PixelVector& pv, const T1& match, const T2& compare,
+                             const ApplyFcn& applyfcn) {
+    std::vector<Pixel>::iterator i = pv.pixels.begin();
+
+    for (; i < pv.pixels.end(); ++i) {
+        if (match(*i)) {
+            /* Find the 'j' where the match ends */
+            std::vector<Pixel>::iterator j = i;
+            do {
+                ++j;
+            } while ((j < pv.pixels.end()) && match(*j));
+
+            PixelVector pv2(pv, i, j);
+            
+            PixelVector pv3(pv2);
+            pv3.sort(compare);
+
+            /* Combine the new sorted vector into the unsorted one */ 
+            pv2.apply(pv3, applyfcn);
+            
+            /* Write to image */
+            pv2.sync();
+
+            /* Send i to the newest value */
+            i = j;
+        }
+    }
+}
+
+template void PixelSort::AsendorfSort(PixelVector& pv, const Matcher& mat, 
+    const Comparator& comp, const ApplyFcn& applyfcn);
+
+template void PixelSort::AsendorfSort(PixelVector& pv, const MatchFcn& mat, 
+    const Comparator& comp, const ApplyFcn& applyfcn);
+
+template void PixelSort::AsendorfSort(PixelVector& pv, const Matcher& mat, 
+    const CompareFcn& comp, const ApplyFcn& applyfcn);
+
+template void PixelSort::AsendorfSort(PixelVector& pv, const MatchFcn& mat, 
+    const CompareFcn& comp, const ApplyFcn& applyfcn);
+
 
 /* utility function */
 void PixelSort::writeColor(const Magick::Color& color, Magick::Quantum* location) {

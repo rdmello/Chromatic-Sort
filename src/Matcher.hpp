@@ -20,27 +20,35 @@ namespace PixelSort {
         virtual bool operator() (const Pixel& pixel) const;
     };
 
+    /* Geometry Matcher is the parent class for matchers which only
+     * need geometry information to match
+     */
+    struct GeometryMatcher : public Matcher {
+        virtual bool operator() (const Pixel& coord) const;
+    };
+
+ 
     /* Matches if ColorCoordinate within Rectangle */
-    struct RectangleMatcher : public Matcher {
-        RectangleMatcher(const BoxCoordinate bounds);
-        virtual bool operator() (const Pixel& pixel) const;
+    struct RectangleMatcher : public GeometryMatcher {
+        RectangleMatcher(BoxCoordinate bounds);
+        virtual bool operator() (const Pixel& coord) const;
     private:
         BoxCoordinate bounds;
     };
 
     /* Matches if ColorCoordinate within Circle */
-    struct CircleMatcher : public Matcher {
+    struct CircleMatcher : public GeometryMatcher {
         CircleMatcher(Coordinate center, double radius);
-        virtual bool operator() (const Pixel& pixel) const;
+        virtual bool operator() (const Pixel& coord) const;
     private:
         Coordinate center;
         double radius;
     };
 
     /* Matches line within rectangle */
-    struct LineMatcher : public Matcher {
+    struct LineMatcher : public GeometryMatcher {
         LineMatcher(Coordinate start, Coordinate end, double radius);
-        virtual bool operator() (const Pixel& pixel) const;
+        virtual bool operator() (const Pixel& coord) const;
     private:
         Coordinate start;
         Coordinate end;
@@ -52,19 +60,19 @@ namespace PixelSort {
      * from the input image that matches conditions
      */
     struct ColorMatcher : public Matcher {
-        virtual bool operator()(const Magick::ColorRGB &color) const;
+        virtual bool operator()(const Pixel &color) const;
     };
 
     /* Matches all colors in an image */
     struct AllMatcher : public ColorMatcher {
-        virtual bool operator()(const Magick::ColorRGB &color) const;
+        virtual bool operator()(const Pixel &color) const;
     };
 
     /* Constructor has two inputs to set internal state
      * of the matcher function */
     struct BWBandMatcher : public ColorMatcher {
         BWBandMatcher(double th_low, double th_high);
-        virtual bool operator()(const Magick::ColorRGB &color) const;
+        virtual bool operator()(const Pixel &color) const;
     private:
         double pool_threshold_low;
         double pool_threshold_high;
@@ -74,7 +82,7 @@ namespace PixelSort {
      * of the matcher function */
     struct RGBBandMatcher : public ColorMatcher {
         RGBBandMatcher(Magick::ColorRGB min, Magick::ColorRGB max);
-        virtual bool operator()(const Magick::ColorRGB &color) const;
+        virtual bool operator()(const Pixel &color) const;
     private:
         Magick::ColorRGB min;
         Magick::ColorRGB max;
@@ -83,7 +91,7 @@ namespace PixelSort {
      * the threshold specified by thresh */
     struct ColorThreshMatcher : public ColorMatcher {
         ColorThreshMatcher(Magick::ColorRGB color, double radius);
-        virtual bool operator()(const Magick::ColorRGB &color) const;
+        virtual bool operator()(const Pixel &color) const;
     private:
         Magick::ColorRGB color;
         double radius;

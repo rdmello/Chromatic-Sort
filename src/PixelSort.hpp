@@ -20,7 +20,12 @@ namespace PixelSort {
     using MatchFcn = bool (*)(const Pixel&);
     using CompareFcn = bool (*)(const Pixel&, const Pixel&);
     using ApplyFcn = Pixel (*)(const Pixel&, const Pixel&);
-            
+
+    /* GenerateFcn is a function which accepts an empty std::vector<Pixel>
+     * and returns the Pixels matched 
+     */
+    // using GenerateFcn = void (*)(std::vector<Pixel>& pixels, const BoxCoordinate& box);
+
     /* PixelVector is the main class which maintains a vector of Pixel objects
      * and provides a set of methods to update pixels and keep them in sync
      * with the Magick::Image object
@@ -29,12 +34,21 @@ namespace PixelSort {
         private:
             Magick::Image& image;
             BoxCoordinate box;
-            std::vector<Pixel> pixels;
         
         public:
+            std::vector<Pixel> pixels;
 
             /* CONSTRUCTOR reading Image into sortable type */
             PixelVector(Magick::Image& image, const BoxCoordinate& box); 
+            
+            /* CONSTRUCTOR from PV::iter [first, last) */
+            PixelVector(const PixelVector& pv, std::vector<Pixel>::iterator first, 
+                        std::vector<Pixel>::iterator last); 
+            
+            /* CONSTRUCTOR uses generator fcn to read part of Image into sortable type */
+            PixelVector(Magick::Image& image, const BoxCoordinate& box, 
+                        const GeometryMatcher& matcher); 
+
             PixelVector(const PixelVector& pv, int start, int end);
 
             /* Writes PixelVector to Magick::Image */
@@ -65,6 +79,11 @@ namespace PixelSort {
     void BlockPixelSort(Magick::Image& image, Coordinate blocksize, 
                         const T1& match, const T2& compare, 
                         const ApplyFcn& applyfcn);
+
+    /* Apply pixelsort operation across block in an image */
+    template <typename T1 = Matcher, typename T2 = Comparator>
+    void AsendorfSort(PixelVector& pv, const T1& match, const T2& compare, 
+                      const ApplyFcn& applyfcn);
 
     /* writeColor is a utility function to help convert and write
      * a Magick::Color to a Quantum triplet
