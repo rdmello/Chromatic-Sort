@@ -12,7 +12,7 @@ using namespace PixelSort;
 
 int main() {
     /* File definitions */
-    std::string filename = "images/expo";
+    std::string filename = "images/night";
     std::string fileext = "tiff";
     std::string filein = filename + "." + fileext; // define input filename
     std::string fileout = filename + "_out" + "." + fileext; // define output filename
@@ -27,40 +27,40 @@ int main() {
     image.modifyImage();
     image.type(Magick::TrueColorType);
 
-    int w = 50;
-    int h = 50;
-    for (int j(0); j < image.rows(); j+=h) {
-        for (int i(0); i < image.columns(); i+=w) {
-            /* Define region-of-interest and make PixelVector */
-            BoundedCoordinate box(i, j, w, h, image.columns(), image.rows());
-            PixelVector pv(image, box);
+    int w = 128;
+    int h = 128;
+    Coordinate block(w, h);
 
-            /* Change sort direction to work in the y-direction */
-            pv.sort([](const Pixel& p1, const Pixel& p2) {
-                return p1.x < p2.x;
-            });
-
-            /* Define and apply a circular matcher */
-            CircleMatcher mat(Coordinate(i+(w/2), j+(h/2)), 15);
-            pv.match(mat);
-
-            /* Sort the vector into a new vector */
-            PixelVector pv2 = pv;
-            pv2.sort([](const Pixel& p1, const Pixel& p2) {
-                return p1.red() < p2.red();
-            });
-
-            /* Combine the new sorted vector into the unsorted one */ 
-            pv.apply(pv2, [](const Pixel& p1, const Pixel& p2) {
-                Pixel p = p1;
-                p.red(p2.red());
-                return p;
-            });
-
-            /* Write to image */
-            pv.sync();
-        }
-    }
+    BlockPixelSort<Matcher, CompareFcn>(image, block, 
+                    LineMatcher(Coordinate(0, 0), Coordinate(w-1, h-1), 8), 
+                    [](const Pixel& p1, const Pixel& p2) {
+                        return p1.red() < p2.red(); 
+                    }, 
+                    [](const Pixel& p1, const Pixel& p2) {
+                        Pixel p(p1);
+                        p.red(p2.blue());
+                        p.blue(p2.red());
+                        return p;
+                });
+ 
+    BlockPixelSort<Matcher, CompareFcn>(image, block, 
+                    LineMatcher(Coordinate(w-1, 0), Coordinate(0, h-1), 8), 
+                    [](const Pixel& p1, const Pixel& p2) {
+                        return p1.blue() < p2.blue(); 
+                    }, 
+                    [](const Pixel& p1, const Pixel& p2) {
+                        Pixel p(p1);
+                        p.blue(p2.red());
+                        p.green(p2.blue());
+                        p.red(p2.green());
+                        return p;
+                });
+ 
+    BlockPixelSort<Matcher, Comparator>(image, Coordinate(8, 8), AllMatcher(), 
+                   SumPixelComparator(), [](const Pixel& p1, const Pixel& p2) {
+        Pixel p(p1, p2);
+        return p;
+    });
     
     image.write(fileout);
     std::cout << "Written image" << std::endl;

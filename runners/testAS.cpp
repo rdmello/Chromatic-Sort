@@ -32,7 +32,7 @@ int main() {
         std::cout << num << " " << std::flush;
         Magick::Image image(image_orig);
         double incr = 0.05;
-        if (num > 6) incr = 0.08;
+        if (num > 6) incr = 0.07;
         BWBandMatcher mat(0.1, 0.2 + (incr*num)); /* Define Asendorf matcher */
         
         for (int j(0); j < image.columns(); ++j) {
@@ -65,18 +65,10 @@ int main() {
                     });
 
                     /* Combine the new sorted vector into the unsorted one */ 
-                    if (num < 6) {
-                        pv2.apply(pv3, [](const Pixel& p1, const Pixel& p2) {
-                            Pixel p(p1, p2);
-                            return p;
-                        });
-                    } else {
-                        pv2.apply(pv3, [](const Pixel& p1, const Pixel& p2) {
-                            Pixel p(p1);
-                            p.red(p2.red());
-                            return p;
-                        });
-                    }
+                    pv2.apply(pv3, [](const Pixel& p1, const Pixel& p2) {
+                        Pixel p(p1, p2);
+                        return p;
+                    });
 
                     /* Write to image */
                     pv2.sync();

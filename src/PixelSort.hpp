@@ -17,6 +17,10 @@
 
 namespace PixelSort {
 
+    using MatchFcn = bool (*)(const Pixel&);
+    using CompareFcn = bool (*)(const Pixel&, const Pixel&);
+    using ApplyFcn = Pixel (*)(const Pixel&, const Pixel&);
+            
     /* PixelVector is the main class which maintains a vector of Pixel objects
      * and provides a set of methods to update pixels and keep them in sync
      * with the Magick::Image object
@@ -25,40 +29,47 @@ namespace PixelSort {
         private:
             Magick::Image& image;
             BoxCoordinate box;
+            std::vector<Pixel> pixels;
+        
         public:
 
-            std::vector<Pixel> pixels;
             /* CONSTRUCTOR reading Image into sortable type */
             PixelVector(Magick::Image& image, const BoxCoordinate& box); 
             PixelVector(const PixelVector& pv, int start, int end);
 
             /* Writes PixelVector to Magick::Image */
             void sync();
-    
+
             /* Apply matcher 
-            * MatcherFunc must be a PixelSort::Matcher, or a function 
-            * which transforms a const PixelSort::Pixel& to a bool */
-            // void match(const Matcher& matcher);
-            void match(Matcher& matcher);
-            void match(bool (*matcher)(const Pixel&));
+             * MatcherFunc must be a PixelSort::Matcher, or a function 
+             * which transforms a const PixelSort::Pixel& to a bool */
+            void match(const Matcher& matcher);
+            void match(const MatchFcn& matcher);
 
             /* Simple Sort pixels */
-            void sort(const PixelComparator& comparator);
-            void sort(bool (*comparator)(const Pixel&, const Pixel&));
+            void sort(const Comparator& comparator);
+            void sort(const CompareFcn& compare);
             
             /* Unstable Sort pixels */
-            void unstable_sort(const PixelComparator& comparator);
-            void unstable_sort(bool (*comparator)(const Pixel&, const Pixel&));
+            void unstable_sort(const Comparator& comparator);
+            void unstable_sort(const CompareFcn& compare);
  
             /* Apply unary/binary function on this PixelVector */
             void apply(void (*func)(Pixel& p));
-            void apply(const PixelVector&, Pixel (*func)(const Pixel& p1, const Pixel& p2));
+            void apply(const PixelVector&, const ApplyFcn& applyfcn);
+
     };
+
+    /* Apply pixelsort operation across block in an image */
+    template <typename T1 = Matcher, typename T2 = Comparator>
+    void BlockPixelSort(Magick::Image& image, Coordinate blocksize, 
+                        const T1& match, const T2& compare, 
+                        const ApplyFcn& applyfcn);
 
     /* writeColor is a utility function to help convert and write
      * a Magick::Color to a Quantum triplet
      */
-    void writeColor(Magick::Color color, Magick::Quantum* location);
+    void writeColor(const Magick::Color& color, Magick::Quantum* location);
 
     /* SortDirection specifies if the sort should be increasing or decreasing
      * in a specific direction

@@ -13,11 +13,11 @@
 
 namespace PixelSort {
 
-    struct PixelComparator {
+    struct Comparator {
         virtual bool operator()(const Pixel& p1, const Pixel& p2);
     };
 
-    struct SumPixelComparator : public PixelComparator {
+    struct SumPixelComparator : public Comparator {
         virtual bool operator()(const Pixel& p1, const Pixel& p2);
     };
 

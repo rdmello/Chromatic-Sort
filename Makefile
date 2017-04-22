@@ -19,7 +19,7 @@ run: $(TARGETDIR)/$(file).run
 	./$(TARGETDIR)/$(file).run
 
 $(TARGETDIR)/%.run: $(RUNDIR)/%.cpp $(SRCFILES)
-	g++ -std=c++14 $(SRCFILES) $< -o $@ $(MAGICKFLAGS)
+	clang++ -Wall -Werror -std=c++14 $(SRCFILES) $< -o $@ $(MAGICKFLAGS)
 
 clean:
 	rm ./$(TARGETDIR)/*.run
