@@ -23,37 +23,10 @@ PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& b
         p.green(rgbColor.green());
         p.blue(rgbColor.blue());
     }
-/*
-    for(int j = 0; j < box.height; ++j) {
-        for(int i = 0; i < 3 * box.width; i += 3) {
-            int idx = i + (j * 3 * box.width);
-            Magick::Color color(a[idx], a[idx+1], a[idx+2]);
-            Magick::ColorRGB rgbColor(color);
-            // Coordinate coord(box.x + (i/3), box.y + j);
-            Coordinate coord(i/3, j);
-            pixels.push_back(Pixel(coord, color));
-        }
-    }
-*/
  }
 
 PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)
-    // : PixelVector(image, box, GeometryMatcher()) {
-    : image{image}, box{BoundedCoordinate(box, image.columns(), image.rows())} {
-    
-    const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
-
-    for(int j = 0; j < box.height; ++j) {
-        for(int i = 0; i < 3 * box.width; i += 3) {
-            int idx = i + (j * 3 * box.width);
-            Magick::Color color(a[idx], a[idx+1], a[idx+2]);
-            Magick::ColorRGB rgbColor(color);
-            // Coordinate coord(box.x + (i/3), box.y + j);
-            Coordinate coord(i/3, j);
-            pixels.push_back(Pixel(coord, color));
-        }
-    }
-}
+    : PixelVector(image, box, GeometryMatcher()) {};
 
 PixelSort::PixelVector::PixelVector(const PixelVector& pv, int start, int end)
     : image(pv.image), box(pv.box) {

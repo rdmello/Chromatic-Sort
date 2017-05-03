@@ -39,11 +39,15 @@ int main() {
         double theta = 0.7854;
         double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
         double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 - 3 < val2;
+        return val1 < val2;
     });
     AsendorfSort<Matcher, Comparator>(pv, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
                                       [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
+                                          Pixel p(p1); 
+                                          p.red(p2.blue());
+                                          p.blue(p2.green());
+                                          p.green(p2.red());
+                                          return p;
     });
     
     std::cout << "Operation 2" << std::endl;

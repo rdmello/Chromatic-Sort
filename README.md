@@ -92,3 +92,10 @@ Main user-facing operations:
 
 1. Refactor Magick++ Image methods to a separate abstract function so that
 other ImProc libraries can be used easily.
+
+## Command-line interface
+
+The PixelSort library should be accessible from a command-line interface. This interface is detailed below:
+
+1. The command used to launch the pixelsorting application is: 
+    "$ pixelsort inputfilename.png/tiff/gif 
