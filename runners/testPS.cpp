@@ -13,8 +13,8 @@ using namespace PixelSort;
 
 int main() {
     /* File definitions */
-    std::string filename = "images/night";
-    std::string fileext = "tiff";
+    std::string filename = "images/earth";
+    std::string fileext = "png";
     std::string filein = filename + "." + fileext; // define input filename
     std::string fileout = filename + "_out" + "." + fileext; // define output filename
 
@@ -28,103 +28,31 @@ int main() {
     image.modifyImage();
     image.type(Magick::TrueColorType);
 
-    int w = 128;
-    int h = 128;
-    Coordinate block(w, h);
+    // int lineWidth = 160;
+    // int delta = 800;
+    int lineWidth = 50;
+    int delta = 200;
 
-    std::cout << "Operation 1" << std::endl;
-    PixelVector pv(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0), Coordinate(image.columns()/2, image.rows()/2), 160));
-    pv.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1); 
-                                          p.red(p2.blue());
-                                          p.blue(p2.green());
-                                          p.green(p2.red());
-                                          return p;
-    });
-    
-    std::cout << "Operation 2" << std::endl;
-    PixelVector pv2(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0+480), 
-                               Coordinate(image.columns()/2, (image.rows()/2)+480), 160));
-    pv2.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv2, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
-    });
-
-    std::cout << "Operation 3" << std::endl;
-    PixelVector pv22(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0+960), 
-                               Coordinate(image.columns()/2, (image.rows()/2)+960), 160));
-    pv22.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv22, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
-    });
-    
-    std::cout << "Operation 4" << std::endl;
-    PixelVector pv3(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0-480), 
-                               Coordinate(image.columns()/2, (image.rows()/2)-480), 160));
-    pv3.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv3, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
-    });
-    
-    std::cout << "Operation 5" << std::endl;
-    PixelVector pv32(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0-960), 
-                               Coordinate(image.columns()/2, (image.rows()/2)-960), 160));
-    pv32.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv32, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
-    });
-    
-    std::cout << "Operation 6" << std::endl;
-    PixelVector pv33(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
-                   LineMatcher(Coordinate(0, 0-960-480), 
-                               Coordinate(image.columns()/2, (image.rows()/2)-960-480), 160));
-    pv33.sort([](const Pixel& p1, const Pixel& p2){
-        double theta = 0.7854;
-        double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
-        double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
-        return val1 < val2;
-    });
-    AsendorfSort<Matcher, Comparator>(pv33, BWBandMatcher(0.0, 0.5), SumPixelComparator(), 
-                                      [](const Pixel& p1, const Pixel& p2) {
-                                          Pixel p(p1, p2); return p;
-    });
-    
+    for (int ix = -15; ix < 16; ++ix) {
+        std::cout << "Operation " << ix << std::endl;
+        PixelVector pv(image, BoxCoordinate(0, 0, image.columns(), image.rows()), 
+            LineMatcher(Coordinate(0, 0+(ix*delta)), 
+                Coordinate(image.columns()/2, (image.rows()/2)+(ix*delta)), lineWidth));
+        pv.sort([](const Pixel& p1, const Pixel& p2){
+            double theta = 0.7854;
+            double val1 = (p1.x*std::cos(theta)) + (p1.y*std::sin(theta));
+            double val2 = (p2.x*std::cos(theta)) + (p2.y*std::sin(theta));
+            return val1 < val2;
+        });
+        AsendorfSort<Matcher, Comparator>(pv, BWBandMatcher(0.05, 0.7), 
+            WeightedComparator(0, 0, 1), 
+            [](const Pixel& p1, const Pixel& p2) {
+                Pixel p(p1); 
+                p.red(p2.blue());
+                return p;
+        });
+    }
+   
     image.write(fileout);
     std::cout << "Written image" << std::endl;
     std::cout << "------------------------------------------" << std::endl;

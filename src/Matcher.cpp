@@ -82,9 +82,9 @@ bool PixelSort::BWBandMatcher::operator()(const Pixel &color) const {
 PixelSort::RGBBandMatcher::RGBBandMatcher(Magick::ColorRGB min, Magick::ColorRGB max): min(min), max(max) {};
 
 bool PixelSort::RGBBandMatcher::operator()(const Pixel &color) const {
-    if ((color.red() < max.red()) && (color.red() > min.red()) &&
-        (color.blue() < max.blue()) && (color.blue() > min.blue()) &&
-        (color.green() < max.green()) && (color.green() > min.green())) {
+    if ((color.red() <= max.red()) && (color.red() >= min.red()) &&
+        (color.blue() <= max.blue()) && (color.blue() >= min.blue()) &&
+        (color.green() <= max.green()) && (color.green() >= min.green())) {
         return true;
     } else {
         return false;

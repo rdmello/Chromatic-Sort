@@ -1,18 +1,27 @@
 
 # Set the paths for the compilation step
-.PHONY: SRCDIR TARGETDIR RUNDIR LIBDIR SRCFILES OBJECTFILES 
+.PHONY: SRCDIR TARGETDIR RUNDIR LIBDIR SRCFILES OBJECTFILES STATICLIBFILE
 SRCDIR = src
 TARGETDIR = target
 RUNDIR = runners
 LIBDIR = lib
 SRCFILES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTFILES = $(patsubst $(SRCDIR)/%.cpp, $(TARGETDIR)/%.o, $(SRCFILES))
+STATICLIBFILE = $(LIBDIR)/PixelSort.a
 
 # Magick++ setup 
-.PHONY: MAGICKFLAGS
+.PHONY: MAGICKFLAGS MAGICK_LOCATION MAGICK_DIRECTIVES MAGICK_INCLUDE_FLAGS MAGICK_RUN_FLAGS
 MAGICKFLAGS = `Magick++-config --cppflags --cxxflags --ldflags --libs`
-MAGICK_INCLUDE_FLAGS = -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/local/Cellar/imagemagick/7.0.4-10/include/ImageMagick-7 
-MAGICK_RUN_FLAGS = -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16 -I/usr/local/Cellar/imagemagick/7.0.4-10/include/ImageMagick-7 -L/usr/local/Cellar/imagemagick/7.0.4-10/lib -lMagick++-7.Q16HDRI
+MAGICK_LOCATION = /usr/local/Cellar/imagemagick/7.0.4-10
+MAGICK_DIRECTIVES = -DMAGICKCORE_HDRI_ENABLE=1 -DMAGICKCORE_QUANTUM_DEPTH=16 
+MAGICK_INCLUDE_FLAGS = $(MAGICK_DIRECTIVES) -I $(MAGICK_LOCATION)/include/ImageMagick-7 
+MAGICK_RUN_FLAGS = $(MAGICK_DIRECTIVES) -I $(MAGICK_LOCATION)/include/ImageMagick-7 -L $(MAGICK_LOCATION)/lib -lMagick++-7.Q16HDRI
+
+# Boost setup
+.PHONY: BOOST_LOCATION BOOST_INCLUDE_FLAGS BOOST_LIBS
+BOOST_LOCATION = ../../../cpp/boost_test/boost_1_64_0_compiled
+BOOST_INCLUDE_FLAGS = -I $(BOOST_LOCATION)/include
+BOOST_LIBS = $(BOOST_LOCATION)/lib/libboost_program_options.a
 
 #
 # MAIN MAKE COMMANDS
@@ -26,14 +35,14 @@ run: $(TARGETDIR)/$(file).run
 
 build: $(TARGETDIR)/$(file).run
 
-libs: $(OBJECTFILES) 
-	ar rvs $(LIBDIR)/PixelSort.a $(OBJECTFILES)
+$(STATICLIBFILE): $(OBJECTFILES) 
+	ar rvs $(STATICLIBFILE) $(OBJECTFILES)
 
 $(TARGETDIR)/%.o: $(SRCDIR)/%.cpp
-	clang++ -c -Wall -Werror -std=c++14 -O3 $< -o $@ $(MAGICK_INCLUDE_FLAGS)
+	clang++ -c -Wall -Werror -std=c++14 -O3 $< -o $@ $(MAGICK_INCLUDE_FLAGS) -I $(SRCDIR) $(BOOST_INCLUDE_FLAGS)
 
-$(TARGETDIR)/%.run: $(RUNDIR)/%.cpp $(OBJECTFILES)
-	clang++ -Wall -Werror -std=c++14 -O3 $(OBJECTFILES) $< -o $@ $(MAGICK_RUN_FLAGS)
+$(TARGETDIR)/%.run: $(RUNDIR)/%.cpp $(STATICLIBFILE)
+	clang++ -Wall -Werror -std=c++14 -O3 $(STATICLIBFILE) $(BOOST_LIBS) -I $(SRCDIR) $< -o $@ $(MAGICK_RUN_FLAGS) 
 
 clean:
 	rm -f ./$(TARGETDIR)/*.run
