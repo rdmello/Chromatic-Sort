@@ -22,7 +22,6 @@
  *  - allow for changing the direction of a sort
  *  - support GIFs
  *  - add partial and tweened gif frame support 
- *  - add support for multiple input color matchers
  *
  */
 
@@ -442,21 +441,37 @@ int main (int argc, char* argv[]) {
                 PS::Coordinate(boxargs[2], boxargs[3]), boxargs[4]));
         }
     }
- 
+
+    /* 
+     * Parse and set sort angle directives
+     */
+    double angle = 0;
+
+    if (vm.count("theta")) 
+    {
+        std::string str = vm["theta"].as<std::string>();
+        angle = std::stod(str);
+        logger.log(3, "Found theta directive: " + std::to_string(angle));
+    }
+
     /* 
      * Read image 
      */
-    try {
+    try 
+    {
         logger.log(3, "Reading image file");
         img.read(infile);
         
         /* Prove that image has been successfully read */
         logger.log(2, "Image successfully read: " + img.fileName());
         logger.log(2, "Dimensions: " + std::to_string(img.columns())+ " x " + std::to_string(img.rows()));    
-
-    } catch(Magick::WarningCoder& warning) {
+    } 
+    catch(Magick::WarningCoder& warning) 
+    {
         logger.log(-2, std::string("Warning: ") + warning.what());
-    } catch (Magick::ErrorFileOpen& error) {
+    } 
+    catch (Magick::ErrorFileOpen& error) 
+    {
         logger.log(-1, std::string("Error while reading image file") + error.what());
     }
 
@@ -493,7 +508,10 @@ int main (int argc, char* argv[]) {
     }
 
     /* Apply color matchers */
-    pv.match(mat);
+    // pv.match(mat);
+
+    /* Rotate pixelvector */
+    pv.sort(PS::AngleComparator(angle));
 
     /* Sort and Apply */
     PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, mat, comp, applyFcn); 

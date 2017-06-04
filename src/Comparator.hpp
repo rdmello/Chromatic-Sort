@@ -31,6 +31,15 @@ namespace PixelSort {
         double blueX;
     };
 
+    struct AngleComparator : public Comparator {
+        AngleComparator();
+        AngleComparator(double angle);
+        void setAngle(double angle);
+        bool operator()(const Pixel& p1, const Pixel& p2) const;
+    private:
+        double angle;
+    };
+
 }
 
 #endif /* _PIXELSORT_COMPARATOR_HPP_ */
