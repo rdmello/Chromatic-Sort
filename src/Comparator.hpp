@@ -14,21 +14,21 @@
 namespace PixelSort {
 
     struct Comparator {
-        virtual bool operator()(const Pixel& p1, const Pixel& p2);
+        virtual bool operator()(const Pixel& p1, const Pixel& p2) const;
     };
 
     /* Adds R, G, and B components and then compares */
     struct SumPixelComparator : public Comparator {
-        virtual bool operator()(const Pixel& p1, const Pixel& p2);
+        bool operator()(const Pixel& p1, const Pixel& p2) const;
     };
 
     struct WeightedComparator : public Comparator {
-        WeightedComparator(double rX, double gX, double bX); 
-        virtual bool operator()(const Pixel& p1, const Pixel& p2);
+        WeightedComparator(double redX, double greenX, double blueX); 
+        bool operator()(const Pixel& p1, const Pixel& p2) const;
         private:
-        double rX;
-        double gX;
-        double bX;
+        double redX;
+        double greenX;
+        double blueX;
     };
 
 }

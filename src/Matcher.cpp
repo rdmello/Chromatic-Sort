@@ -14,12 +14,13 @@ bool PixelSort::GeometryMatcher::operator() (const Pixel &coord) const {
 
 
 PixelSort::RectangleMatcher::RectangleMatcher(BoxCoordinate bounds): bounds(bounds) {};
+PixelSort::RectangleMatcher::RectangleMatcher(): bounds(15, 24, 10, 10) {};
 
 bool PixelSort::RectangleMatcher::operator()(const Pixel &coord) const {
     if ((coord.x >= bounds.x) &&
         (coord.y >= bounds.y) &&
-        (coord.x <  bounds.x + bounds.width) &&
-        (coord.y <  bounds.y + bounds.height)) {
+        (coord.x <=  bounds.x + bounds.width) &&
+        (coord.y <=  bounds.y + bounds.height)) {
         return true;
     } else {
         return false;
@@ -28,6 +29,7 @@ bool PixelSort::RectangleMatcher::operator()(const Pixel &coord) const {
 
 
 PixelSort::CircleMatcher::CircleMatcher(Coordinate center, double radius): center(center), radius(radius) {};
+PixelSort::CircleMatcher::CircleMatcher(): center(15, 24), radius(10) {};
 
 bool PixelSort::CircleMatcher::operator()(const Pixel &coord) const {
     double xdiff = std::abs(double(coord.x - center.x));
@@ -39,6 +41,7 @@ bool PixelSort::CircleMatcher::operator()(const Pixel &coord) const {
 
 PixelSort::LineMatcher::LineMatcher(Coordinate start, Coordinate end, double radius): 
     start{start}, end{end}, radius{radius} {};
+PixelSort::LineMatcher::LineMatcher(): start(15, 24), end(25, 25), radius(10) {};
 
 bool PixelSort::LineMatcher::operator() (const Pixel& coord) const {
     /* Build coordinates into Ax + By + C = 0 */
@@ -84,9 +87,12 @@ PixelSort::RGBBandMatcher::RGBBandMatcher(Magick::ColorRGB min, Magick::ColorRGB
 bool PixelSort::RGBBandMatcher::operator()(const Pixel &color) const {
     if ((color.red() <= max.red()) && (color.red() >= min.red()) &&
         (color.blue() <= max.blue()) && (color.blue() >= min.blue()) &&
-        (color.green() <= max.green()) && (color.green() >= min.green())) {
+        (color.green() <= max.green()) && (color.green() >= min.green())) 
+    {
         return true;
-    } else {
+    } 
+    else 
+    {
         return false;
     }
 }

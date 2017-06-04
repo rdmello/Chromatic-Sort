@@ -38,7 +38,7 @@ build: $(TARGETDIR)/$(file).run
 $(STATICLIBFILE): $(OBJECTFILES) 
 	ar rvs $(STATICLIBFILE) $(OBJECTFILES)
 
-$(TARGETDIR)/%.o: $(SRCDIR)/%.cpp
+$(TARGETDIR)/%.o: $(SRCDIR)/%.cpp $(SRCDIR)/%.hpp
 	clang++ -c -Wall -Werror -std=c++14 -O3 $< -o $@ $(MAGICK_INCLUDE_FLAGS) -I $(SRCDIR) $(BOOST_INCLUDE_FLAGS)
 
 $(TARGETDIR)/%.run: $(RUNDIR)/%.cpp $(STATICLIBFILE)

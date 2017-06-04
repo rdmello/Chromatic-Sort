@@ -30,6 +30,7 @@ namespace PixelSort {
  
     /* Matches if ColorCoordinate within Rectangle */
     struct RectangleMatcher : public GeometryMatcher {
+        RectangleMatcher();
         RectangleMatcher(BoxCoordinate bounds);
         virtual bool operator() (const Pixel& coord) const;
     private:
@@ -38,6 +39,7 @@ namespace PixelSort {
 
     /* Matches if ColorCoordinate within Circle */
     struct CircleMatcher : public GeometryMatcher {
+        CircleMatcher();
         CircleMatcher(Coordinate center, double radius);
         virtual bool operator() (const Pixel& coord) const;
     private:
@@ -47,6 +49,7 @@ namespace PixelSort {
 
     /* Matches line within rectangle */
     struct LineMatcher : public GeometryMatcher {
+        LineMatcher();
         LineMatcher(Coordinate start, Coordinate end, double radius);
         virtual bool operator() (const Pixel& coord) const;
     private:

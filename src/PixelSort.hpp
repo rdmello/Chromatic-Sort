@@ -72,6 +72,8 @@ namespace PixelSort {
             void apply(void (*func)(Pixel& p));
             void apply(const PixelVector&, const ApplyFcn& applyfcn);
 
+            /* Print the pixel values of the first 10 elements in PixelVector */
+            void print();
     };
 
     /* Apply pixelsort operation across block in an image */

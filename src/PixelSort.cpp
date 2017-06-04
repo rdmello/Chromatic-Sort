@@ -68,7 +68,7 @@ void PixelSort::PixelVector::match(const MatchFcn& matcher) {
 
 /* STABLE SORT */
 void PixelSort::PixelVector::sort(const Comparator& comparator) {
-    std::stable_sort(pixels.begin(), pixels.end(), comparator);
+    std::stable_sort(pixels.begin(), pixels.end(), std::ref(comparator));
 }
 void PixelSort::PixelVector::sort(const CompareFcn& comparator) {
     std::stable_sort(pixels.begin(), pixels.end(), comparator);
@@ -103,6 +103,7 @@ void PixelSort::BlockPixelSort(Magick::Image& image, Coordinate blocksize,
 
     while (bounds.y < image.rows()) {
         bounds.x = 0;
+        
         while (bounds.x < image.columns()) {
 
             /* Define region-of-interest and make PixelVector */
@@ -147,8 +148,9 @@ template void PixelSort::BlockPixelSort(Magick::Image& image,
  * template declaration and instantiations for AsendorfSort
  */
 template <typename T1, typename T2>
-void PixelSort::AsendorfSort(PixelVector& pv, const T1& match, const T2& compare,
-                             const ApplyFcn& applyfcn) {
+void PixelSort::AsendorfSort(PixelVector& pv, 
+    const T1& match, const T2& compare, const ApplyFcn& applyfcn) 
+{
     std::vector<Pixel>::iterator i = pv.pixels.begin();
 
     for (; i < pv.pixels.end(); ++i) {
@@ -188,6 +190,18 @@ template void PixelSort::AsendorfSort(PixelVector& pv, const Matcher& mat,
 template void PixelSort::AsendorfSort(PixelVector& pv, const MatchFcn& mat, 
     const CompareFcn& comp, const ApplyFcn& applyfcn);
 
+void PixelSort::PixelVector::print() {
+    std::vector<Pixel>::iterator i = pixels.begin();
+    std::vector<Pixel>::iterator j = i+10;
+    for ( ; i < j; ++i) {
+        std::cout << " (" + std::to_string(i->red()) + "," + 
+                            std::to_string(i->green()) + "," + 
+                            std::to_string(i->blue()) + "," + 
+                            std::to_string(i->x) + "," + 
+                            std::to_string(i->y) + ")=" + 
+                            std::to_string(i->red()+i->blue()+i->green()) << std::endl;
+    }
+}
 
 /* utility function */
 void PixelSort::writeColor(const Magick::Color& color, Magick::Quantum* location) {
