@@ -15,14 +15,14 @@ PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& b
     
     const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
-   for (Pixel& p : pixels) {
-        int idx = 3*(p.x + p.y*box.width);
-        Magick::Color color(a[idx], a[idx+1], a[idx+2]);
-        Magick::ColorRGB rgbColor(color);
-        p.red(rgbColor.red());
-        p.green(rgbColor.green());
-        p.blue(rgbColor.blue());
-    }
+    for (Pixel& p : pixels) {
+         int idx = 3*(p.x + p.y*box.width);
+         Magick::Color color(a[idx], a[idx+1], a[idx+2]);
+         Magick::ColorRGB rgbColor(color);
+         p.red(rgbColor.red());
+         p.green(rgbColor.green());
+         p.blue(rgbColor.blue());
+     }
  }
 
 PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)

@@ -17,11 +17,12 @@
  *  - matching a color range using --red, --blue, etc
  *  - Asendorf sort by default
  *  - add geometry matchers like line, circle, subrect
+ *  - allow for changing the direction of a sort
  *
  * todos:
- *  - allow for changing the direction of a sort
  *  - support GIFs
  *  - add partial and tweened gif frame support 
+ *  - show progress bar
  *
  */
 
@@ -309,8 +310,8 @@ int main (int argc, char* argv[]) {
         }
 
         rMin = redargs[0]; rMax = redargs[1];
-        std::cout << "Red matcher definition found: "
-                  << rMin << ", " << rMax << std::endl;
+        logger.log(3, "Red matcher definition found: "
+                  + std::to_string(rMin)  + ", " + std::to_string(rMax));
     }
     
     if (vm.count("green")) {
@@ -326,8 +327,8 @@ int main (int argc, char* argv[]) {
             greenargs.push_back(std::stod(i));
         }
         gMin = greenargs[0]; gMax = greenargs[1];
-        std::cout << "Green matcher definition found: "
-                  << gMin << ", " << gMax << std::endl;
+        logger.log(3, "Green matcher definition found: "
+                  + std::to_string(gMin) + ", " + std::to_string(gMax) );
     }
     
     if (vm.count("blue")) {
@@ -343,8 +344,8 @@ int main (int argc, char* argv[]) {
             blueargs.push_back(std::stod(i));
         }
         bMin = blueargs[0]; bMax = blueargs[1];
-        std::cout << "Blue matcher definition found: "
-                  << bMin << ", " << bMax << std::endl;
+        logger.log(3, "Blue matcher definition found: "
+                  + std::to_string(bMin) + ", " + std::to_string(bMax));
     }
 
     if (vm.count("mean")) {
@@ -362,8 +363,8 @@ int main (int argc, char* argv[]) {
         rMin = bwargs[0]; rMax = bwargs[1];
         gMin = bwargs[0]; gMax = bwargs[1];
         bMin = bwargs[0]; bMax = bwargs[1];
-        std::cout << "Black-and-white matcher definition found: "
-                  << bMin << ", " << bMax << std::endl;
+        logger.log(3, "Black-and-white matcher definition found: "
+                  + std::to_string(bMin) + ", " + std::to_string(bMax));
     }
 
     /* Read geometric selectors, if defined */

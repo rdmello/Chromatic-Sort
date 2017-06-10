@@ -24,11 +24,11 @@ bool PixelSort::WeightedComparator::operator()(const Pixel& p1, const Pixel& p2)
 }
 
 PixelSort::AngleComparator::AngleComparator(): angle(0) {};
-PixelSort::AngleComparator::AngleComparator(double angle): angle(angle) {};
+PixelSort::AngleComparator::AngleComparator(double angle) { setAngle(angle); };
 
 void PixelSort::AngleComparator::setAngle(double angle) 
 { 
-    this->angle = angle; 
+    this->angle = 3.14159 * (angle + 90.0) / 180.0; 
 }
 
 bool PixelSort::AngleComparator::operator()(const Pixel& p1, const Pixel& p2) const 

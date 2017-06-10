@@ -31,6 +31,11 @@ namespace PixelSort {
         double blueX;
     };
 
+    /* The angle comparator can reorder a pixelvector 
+     * in a way that makes it seem like the individual pixels are rotated.
+     * Provide an angle argument (in degrees) when constructing.
+     * Angles are measured counter-clockwise from the horizontal-right
+     */
     struct AngleComparator : public Comparator {
         AngleComparator();
         AngleComparator(double angle);
