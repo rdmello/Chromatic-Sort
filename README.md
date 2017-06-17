@@ -1,19 +1,20 @@
 
-# C++ PixelSorting
+# C++ PixelSorting Library
 
-## Goals
+## Goal
 
-1. A thin interface to ImageMagick libraries for PixelSorting
-
-2. Encapsulating common workflows in a generic interface
-
-3. Ensuing that performance and accuracy are maintained
+Provide a simple, easy-to-use, and performant C++ pixelsorting library
 
 ## Building
 
 1. Install the ImageMagick and Magick++ libraries on your system. You must be able to use the `magick++-config` command on your command line.
 
-2. Run "make all" and "make run file=test" from this directory
+2. Download or clone this project's source code using 
+```
+    git clone https://github.com/rdmello/PixelSort.git
+```
+
+3. Run `make all` and `make run file=interactive` from this directory
 
 ## Design
 
@@ -21,13 +22,15 @@ The PixelSorting interface in this code has gone through a large number of itera
 
 Here is an overview of the interface:
 
-1. The pixelbuffer from an image (or GIF frame) is converted to a 2D  `Coordinate` array (see `src/Coordinate.hpp`).
+1. An image can be read using the `Magick::Image` class. Then, it can be converted to a `PixelVector` which is ready for sort operations.
 
 2. This Coordinate array is filtered and reduced using the `ColorMatcher` and `GeometryMatcher` subclasses.  
 
-3. The filtered Coordinate array is then copied and the copy is sorted using `PixelSorter`. A `PixelSortComparator` can also be used to refine the sort.
+3. The `PixelVector` is then copied and the copy is sorted using `PixelSorter`. A `PixelSort::Comparator` can also be used to refine the sort.
 
-4. The sorted Coordinate array is written back to the Image using the `ColorMapper` subclasses. Here, the whole color, or a component of a color can be defined to be written back to the Image.
+4. The new sorted `PixelVector` is then zipped with the original unsorted `PixelVector`.
+
+5. The resulting `PixelVector` is written back to the `Magick::Image` which then outputs back to the image file on your filesystem.
 
 ## Code Structure
 
