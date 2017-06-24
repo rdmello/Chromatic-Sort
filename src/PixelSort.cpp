@@ -101,10 +101,10 @@ void PixelSort::BlockPixelSort(Magick::Image& image, Coordinate blocksize,
     BoundedCoordinate bounds(0, 0, blocksize.x, blocksize.y, 
                              image.columns(), image.rows());
 
-    while (bounds.y < image.rows()) {
+    while (bounds.y < (signed) image.rows()) {
         bounds.x = 0;
         
-        while (bounds.x < image.columns()) {
+        while (bounds.x < (signed) image.columns()) {
 
             /* Define region-of-interest and make PixelVector */
             PixelVector pv(image, bounds);

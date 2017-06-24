@@ -7,7 +7,7 @@
 
 #include <Magick++.h>
 
-#include "../src/PixelSort.hpp"
+#include "PixelSort.hpp"
 
 using namespace PixelSort;
 
