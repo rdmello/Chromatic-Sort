@@ -33,7 +33,7 @@ namespace PixelSort {
         RectangleMatcher();
         RectangleMatcher(BoxCoordinate bounds);
         virtual bool operator() (const Pixel& coord) const;
-    private:
+
         BoxCoordinate bounds;
     };
 
@@ -42,7 +42,7 @@ namespace PixelSort {
         CircleMatcher();
         CircleMatcher(Coordinate center, double radius);
         virtual bool operator() (const Pixel& coord) const;
-    private:
+
         Coordinate center;
         double radius;
     };
@@ -52,7 +52,7 @@ namespace PixelSort {
         LineMatcher();
         LineMatcher(Coordinate start, Coordinate end, double radius);
         virtual bool operator() (const Pixel& coord) const;
-    private:
+
         Coordinate start;
         Coordinate end;
         double radius;

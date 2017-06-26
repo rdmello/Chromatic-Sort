@@ -39,6 +39,10 @@ namespace PS = PixelSort;
 #include "boost/program_options.hpp"
 namespace po = boost::program_options;
 
+/* Testing QApplication and QLabel on macOS */
+#include <QApplication>
+#include <QLabel>
+
 /* Helper function which generates the correct Applicator
  * for pixelsorting 
  */
@@ -100,6 +104,11 @@ int main (int argc, char* argv[]) {
 
     Magick::InitializeMagick("");
 
+    // QApplication app(argc, argv);
+    // QLabel hello("Hello, World!");
+    // hello.show();
+    // app.exec();
+
     /* 
      * SECTION 1: Parsing command-line options using boost::program_options
      */
@@ -134,8 +143,8 @@ int main (int argc, char* argv[]) {
         ("sort,S", po::value<std::string>(), "color to be compared and sorted (R,G,B,A)")
         ("color,C", po::value<std::string>(), "color to be moved (R,G,B,A)")
         ("theta,T", po::value<std::string>(), "rotate sort direction theta (angle,in,out)")
-        ("Xrepeat,X", po::value<std::string>(), "repeat in X-direction (Fill,+,-)")
-        ("Yrepeat,Y", po::value<std::string>(), "repeat in Y-direction (Fill,+,-)")
+        ("Xrepeat,X", po::value<std::string>(), "repeat in X-direction (start,pitch,end)")
+        ("Yrepeat,Y", po::value<std::string>(), "repeat in Y-direction (start,pitch,end)")
     ;
 
     /* Visible options */
@@ -456,6 +465,50 @@ int main (int argc, char* argv[]) {
     }
 
     /* 
+     * Parse and set Xrepeat and Yrepeat parameters
+     */
+    double Xstart = 0, Xpitch = 100, Xend = 0;
+    double Ystart = 0, Ypitch = 100, Yend = 0;
+    if (vm.count("Xrepeat"))
+    {
+        std::string Xstr = vm["Xrepeat"].as<std::string>();
+        for (auto&& i: Xstr) {
+            if (i == ',') {
+                i = ' ';
+            }
+        }
+        std::istringstream iss{Xstr};
+        std::vector<std::string> Xlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+
+        Xstart = std::stoi(Xlist[0]);
+        Xpitch = std::stoi(Xlist[1]);
+        Xend   = std::stoi(Xlist[2]);
+
+        logger.log(2, "X-Repeat definition found: (" + std::to_string(Xstart)
+            + "," + std::to_string(Xpitch) + "," + std::to_string(Xend) + ")");
+    }
+
+    if (vm.count("Yrepeat"))
+    {
+        std::string Ystr = vm["Yrepeat"].as<std::string>();
+        for (auto&& i: Ystr) {
+            if (i == ',') {
+                i = ' ';
+            }
+        }
+        std::istringstream iss{Ystr};
+        std::vector<std::string> Ylist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+
+        Ystart = std::stoi(Ylist[0]);
+        Ypitch = std::stoi(Ylist[1]);
+        Yend   = std::stoi(Ylist[2]);
+
+        logger.log(2, "Y-Repeat definition found: (" + std::to_string(Ystart)
+            + "," + std::to_string(Ypitch) + "," + std::to_string(Yend) + ")");
+
+    }
+
+    /* 
      * Read image 
      */
     try 
@@ -487,36 +540,69 @@ int main (int argc, char* argv[]) {
     img.modifyImage();
     img.type(Magick::TrueColorType);
 
+    Xstart = quadMatchers.size() >= 1 ? quadMatchers[0].bounds.x : 0;
+    Ystart = quadMatchers.size() >= 1 ? quadMatchers[0].bounds.y : 0;
+
+    Xstart = diskMatchers.size() >= 1 ? diskMatchers[0].center.x - diskMatchers[0].radius: Xstart;
+    Ystart = diskMatchers.size() >= 1 ? diskMatchers[0].center.y - diskMatchers[0].radius: Ystart;
+
+    Xstart = lineMatchers.size() >= 1 ? lineMatchers[0].start.x : Xstart;
+    Ystart = lineMatchers.size() >= 1 ? lineMatchers[0].start.y : Ystart;
+
+    if (vm.count("Xrepeat") < 1) {
+        Xend = img.columns();
+        Xpitch = img.columns();
+    }
+    if (vm.count("Yrepeat") < 1) {
+        Yend = img.rows();
+        Ypitch = img.rows();
+    }
+
     /* Select a minimal region within the image */
-    if (quadMatchers.size() >= 1) {
-        logger.log(3, "Using user-defined selector for minimal image read");
-    } else {
-        quadMatchers.push_back(PS::RectangleMatcher(PS::BoxCoordinate(0, 0, img.columns(), img.rows())));
-        logger.log(3, "Using default selector for image read");
+    for (double coordX = Xstart; coordX < Xend; coordX += Xpitch) {
+        for (double coordY = Ystart; coordY < Yend; coordY += Ypitch) {
+            logger.log(2, "On iteration: (" + std::to_string(coordX) + 
+                "," + std::to_string(coordY) + ")"); 
+
+            if (quadMatchers.size() >= 1) {
+                logger.log(3, "Using user-defined selector for minimal image read");
+            } else {
+                quadMatchers.push_back(PS::RectangleMatcher(PS::BoxCoordinate(coordX, coordY, Xpitch, Ypitch)));
+                logger.log(3, "Using default selector for image read");
+            }
+            quadMatchers[0].bounds.x = coordX;
+            quadMatchers[0].bounds.y = coordY;
+
+            /* Build a PixelVector from the image's pixels */
+            PS::PixelVector pv(img, 
+                            PS::BoxCoordinate(0, 0, img.columns(), img.rows()),
+                            quadMatchers[0]); 
+        
+            /* Apply more selectors */
+            for (PS::CircleMatcher& circ : diskMatchers) {
+                circ.center.x = coordX + circ.radius;
+                circ.center.y = coordY + circ.radius;
+                pv.match(circ);  
+            }
+            for (PS::LineMatcher& line : lineMatchers) {
+                line.start.x = coordX;
+                line.start.y = coordY;
+                pv.match(line);  
+                line.end.x += Xpitch;
+                line.end.y += Ypitch;
+            }
+
+            /* Apply color matchers */
+            // pv.match(mat);
+
+            /* Rotate pixelvector */
+            pv.sort(PS::AngleComparator(angle));
+
+            /* Sort and Apply */
+            PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, mat, comp, applyFcn); 
+        }
     }
 
-    /* Build a PixelVector from the image's pixels */
-    PS::PixelVector pv(img, 
-                       PS::BoxCoordinate(0, 0, img.columns(), img.rows()),
-                       quadMatchers[0]); 
-   
-    /* Apply more selectors */
-    for (PS::CircleMatcher& circ : diskMatchers) {
-        pv.match(circ);  
-    }
-    for (PS::LineMatcher& line : lineMatchers) {
-        pv.match(line);  
-    }
-
-    /* Apply color matchers */
-    // pv.match(mat);
-
-    /* Rotate pixelvector */
-    pv.sort(PS::AngleComparator(angle));
-
-    /* Sort and Apply */
-    PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, mat, comp, applyFcn); 
-    
     /* Write to output file */
     logger.log(2, "Writing to outfile: " + outfile);
     img.write(outfile);
