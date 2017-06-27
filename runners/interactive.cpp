@@ -214,8 +214,8 @@ int main (int argc, char* argv[]) {
 
         /* Define a default output filename */ 
         outfile = infile;
-        int dot_idx = outfile.find_last_of(".");
-        outfile.insert(dot_idx, "_out");
+        // int dot_idx = outfile.find_last_of(".");
+        // outfile.insert(dot_idx, "_out");
         logger.log(3, "Output filename default: " + outfile);
     } else {
         logger.log(-1, "No input file found, exiting....");
