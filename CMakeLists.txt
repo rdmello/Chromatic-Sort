@@ -64,30 +64,54 @@ find_package(Boost REQUIRED COMPONENTS program_options)
 include_directories(${Boost_INCLUDE_DIRS})
 
 ###################################
-# src and runners setup
-include_directories("${PROJECT_SOURCE_DIR}/src")
-add_subdirectory(src)
+# Google Test setup
+add_subdirectory(googletest)
+enable_testing()
+include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-include_directories("${PROJECT_SOURCE_DIR}/runners")
-add_subdirectory(runners)
+###################################
+# PixelSort library setup
+add_library(
+    PixelSortLib
+    lib/Coordinate.cpp
+    lib/Comparator.cpp
+    lib/Matcher.cpp
+    lib/PixelSort.cpp
+)
+include_directories("${PROJECT_SOURCE_DIR}/lib")
+add_subdirectory(lib)
+
+###################################
+# runner setup
+include_directories("${PROJECT_SOURCE_DIR}/runner")
+add_subdirectory(runner)
 
 ###################################
 # Final executable generation
 add_executable(
     pixelsort 
-    src/Coordinate.cpp
-    src/Comparator.cpp
-    src/Matcher.cpp
-    src/PixelSort.cpp
-    runners/interactive.cpp
+    runner/interactive.cpp
 )
 
 target_link_libraries(
     pixelsort 
+    PixelSortLib
     Qt5::Widgets 
     ${ImageMagick_LIBRARIES}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
+
+###################################
+# unit tests
+add_executable(runUnitTests test/testSetup.cpp)
+target_link_libraries(
+    runUnitTests 
+    PixelSortLib 
+    ${ImageMagick_LIBRARIES}
+    gtest 
+    gtest_main
+)
+add_test(runUnitTests runUnitTests)
 
 ####################################
 # Install the executable
