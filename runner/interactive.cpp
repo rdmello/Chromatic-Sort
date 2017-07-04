@@ -23,6 +23,13 @@
  *  - support GIFs
  *  - add partial and tweened gif frame support 
  *  - show progress bar
+ * 
+ * gui features:
+ *  - 
+ *
+ * gui todos:
+ *  - fix native macOS menubar
+ *  - save and restore window size and position
  *
  */
 
@@ -40,8 +47,16 @@ namespace PS = PixelSort;
 namespace po = boost::program_options;
 
 /* Testing QApplication and QLabel on macOS */
+#include <QObject>
 #include <QApplication>
-#include <QLabel>
+#include <QMainWindow>
+#include <QDockWidget>
+#include <QMenuBar>
+#include <QMenu>
+
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QPushButton>
 
 /* Helper function which generates the correct Applicator
  * for pixelsorting 
@@ -104,10 +119,41 @@ int main (int argc, char* argv[]) {
 
     Magick::InitializeMagick("");
 
-    // QApplication app(argc, argv);
-    // QLabel hello("Hello, World!");
-    // hello.show();
-    // app.exec();
+    if (argc <= 1) {
+        QApplication app(argc, argv);
+        QMainWindow window;
+        window.resize(700,500);
+
+        // Add central GraphicsView widget
+        QGraphicsScene scene(&window);
+        scene.addText("Hello, World??");
+
+        QGraphicsView view(&scene, &window);
+        window.setCentralWidget(&view);
+
+        // set up dockwidget
+        QDockWidget dockwidget("Dock Widget", &window);
+        window.addDockWidget(Qt::LeftDockWidgetArea, &dockwidget);
+        dockwidget.setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+       
+        // add button to dockwidget
+        QPushButton button("Quit", &dockwidget);
+        dockwidget.setWidget(&button);
+       
+        // Button action
+        QObject::connect(&button, SIGNAL(clicked()), &app, SLOT(quit()));
+
+        // Set up menubar
+        QMenu fileMenu("File"); 
+        fileMenu.addAction("Item 1");
+        fileMenu.addAction("Item 2");
+        window.menuBar()->addMenu(&fileMenu);
+        window.menuBar()->setNativeMenuBar(false);
+
+        // show window and execute
+        window.show();
+        return app.exec();
+    }
 
     /* 
      * SECTION 1: Parsing command-line options using boost::program_options
