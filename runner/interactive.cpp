@@ -46,22 +46,9 @@ namespace PS = PixelSort;
 #include "boost/program_options.hpp"
 namespace po = boost::program_options;
 
+#include "PixelSortApp.hpp"
+
 /* Testing QApplication and QLabel on macOS */
-#include <QObject>
-#include <QApplication>
-#include <QMainWindow>
-#include <QDockWidget>
-#include <QMenuBar>
-#include <QMenu>
-#include <QFormLayout>
-
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QPixmap>
-
-#include <QFileDialog>
-#include <QPushButton>
-
 /* Helper function which generates the correct Applicator
  * for pixelsorting 
  */
@@ -119,82 +106,15 @@ public:
     }
 };
 
-struct PixmapUpdate {
-    QPixmap* pm;
-    PixmapUpdate(QPixmap* pm): pm{pm} {};
-    void operator()(const char* str) {
-        pm->load(str);
-    };
-};
-
 int main (int argc, char* argv[]) {
 
     Magick::InitializeMagick("");
 
     if (argc <= 1) {
         QApplication app(argc, argv);
-        QMainWindow window;
-        window.resize(700,500);
-        window.setWindowTitle("PixelSort");
+        PixelSortApp psapp;
 
-        // Add central GraphicsView widget
-        QString infile("/Users/Rylan/Desktop/Projects/Glitch/sorting/cxx_proj/images/expo_out.tiff");
-        QGraphicsScene scene(&window);
-        QPixmap pixmap(infile);
-        scene.addPixmap(pixmap);
-        PixmapUpdate pmu(&pixmap);
-
-        QGraphicsView view(&scene, &window);
-        window.setCentralWidget(&view);
-
-        // set up dockwidget
-        QDockWidget dockwidget("Tools", &window);
-        window.addDockWidget(Qt::LeftDockWidgetArea, &dockwidget);
-        dockwidget.setAllowedAreas(Qt::LeftDockWidgetArea);
-        dockwidget.setFeatures(QDockWidget::NoDockWidgetFeatures);
-        QWidget dockwidget_mid(&dockwidget);
-        dockwidget.setWidget(&dockwidget_mid);
-
-        // Create vertical layout container
-        QVBoxLayout vbox(&dockwidget_mid);
-
-        // add import button to vbox
-        QPushButton importbutton("Import", &dockwidget_mid);
-        vbox.addWidget(&importbutton);
-
-        QFileDialog fileimport(&window);
-        fileimport.setFileMode(QFileDialog::ExistingFile);
-        fileimport.setAcceptMode(QFileDialog::AcceptOpen);
-        fileimport.setNameFilter("Images (*.png *.tiff)");
-        fileimport.fileSelected(infile);
-        QObject::connect(&importbutton, SIGNAL(clicked()), &fileimport, SLOT(exec()));
-        // QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), &pixmap, SLOT(load(const char*)));
-        QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), &scene, SLOT(update()));
-        QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), &view, SLOT(update()));
- 
-        // Set up the form layout widget 
-        QFormLayout formlayout(&dockwidget_mid);
-        vbox.addLayout(&formlayout);
- 
-        // add import button to formlayout
-        QPushButton importbutton2("Import", &dockwidget_mid);
-        formlayout.addRow("Import2", &importbutton2);
-        QObject::connect(&importbutton2, SIGNAL(clicked()), &app, SLOT(quit()));
-      
-        // add quit button to vbox
-        QPushButton quitbutton("Quit", &dockwidget_mid);
-        vbox.addWidget(&quitbutton);
-        QObject::connect(&quitbutton, SIGNAL(clicked()), &app, SLOT(quit()));
-
-        // Set up menubar
-        QMenu fileMenu("File"); 
-        fileMenu.addAction("Item 1");
-        fileMenu.addAction("Item 2");
-        window.menuBar()->addMenu(&fileMenu);
-        window.menuBar()->setNativeMenuBar(false);
-
-        // show window and execute
-        window.show();
+        psapp.show();
         return app.exec();
     }
 
