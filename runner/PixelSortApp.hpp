@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPixmap>
+#include <QGraphicsPixmapItem>
 
 #include <QFileDialog>
 #include <QPushButton>
@@ -19,13 +20,14 @@ class PixelSortApp : public QMainWindow
     Q_OBJECT
 
 public:
-    PixelSortApp();
+    PixelSortApp(QApplication* appPtr);
 
 private:
+    QApplication* appPtr;
     QString imageFilePath;
     QGraphicsScene scene;
-    QPixmap pixmap;
     QGraphicsView view;
+    QGraphicsPixmapItem* mainImg;
     QDockWidget dockwidget;
     QWidget dockwidget_mid;
     
@@ -39,6 +41,10 @@ private:
     QPushButton quitbutton;
         
     QMenu fileMenu; 
+
+public slots:
+    void reloadImage(QString);
+    void updateScene(QPixmap&);
 };
 
 

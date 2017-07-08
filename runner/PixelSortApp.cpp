@@ -1,7 +1,8 @@
 
 #include "PixelSortApp.hpp"
 
-PixelSortApp::PixelSortApp(): 
+PixelSortApp::PixelSortApp(QApplication* parent):
+    appPtr(parent),
     scene(this),
     view(&scene, this),
     dockwidget("Tools", this),
@@ -9,17 +10,18 @@ PixelSortApp::PixelSortApp():
     vbox(&dockwidget_mid),
     importbutton("Import", &dockwidget_mid),
     fileimport(this),
-    formlayout(&dockwidget_mid),
+    formlayout(),
     importbutton2("Import", &dockwidget_mid),
     quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
 {
-    this->resize(800, 800);
+    this->resize(800, 500);
     this->setWindowTitle("PixelSort app v2");
 
     imageFilePath = "/Users/Rylan/Desktop/Projects/Glitch/sorting/cxx_proj/images/expo_out.tiff";
-    pixmap.load(imageFilePath);
-    scene.addPixmap(pixmap);
+    QPixmap pixmap(imageFilePath);
+    mainImg = scene.addPixmap(pixmap);
+
     this->setCentralWidget(&view);
         
     // set up dockwidget
@@ -38,27 +40,37 @@ PixelSortApp::PixelSortApp():
 
     // Connect actual events
     QObject::connect(&importbutton, SIGNAL(clicked()), &fileimport, SLOT(exec()));
-    QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), &scene, SLOT(update()));
-    QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), &view, SLOT(update()));
+    QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), this, SLOT(reloadImage(QString)));
  
     // Set up the form layout widget 
     vbox.addLayout(&formlayout);
     
     // add import button to formlayout
     formlayout.addRow("Import2", &importbutton2);
-    QObject::connect(&importbutton2, SIGNAL(clicked()), this, SLOT(quit()));
+    QObject::connect(&importbutton2, SIGNAL(clicked()), appPtr, SLOT(quit()));
  
     // add quit button to vbox
     vbox.addWidget(&quitbutton);
-    QObject::connect(&quitbutton, SIGNAL(clicked()), this, SLOT(quit()));
+    QObject::connect(&quitbutton, SIGNAL(clicked()), appPtr, SLOT(quit()));
 
     // Set up menubar
     fileMenu.addAction("Item 1");
     fileMenu.addAction("Item 2");
     this->menuBar()->addMenu(&fileMenu);
-    this->menuBar()->setNativeMenuBar(false);
-
-
+    this->menuBar()->addAction(fileMenu.menuAction());
+    this->menuBar()->show();
+    // this->menuBar()->setNativeMenuBar(false);
 }
 
+void PixelSortApp::reloadImage(QString fileStr) {
+    QPixmap newImg(fileStr);
+    mainImg->setPixmap(newImg);
+    updateScene(newImg);
+}
 
+void PixelSortApp::updateScene(QPixmap& newImg) {
+    scene.update();
+    scene.setSceneRect(newImg.rect());
+    view.update();
+    view.fitInView(mainImg, Qt::KeepAspectRatio);
+}

@@ -118,3 +118,9 @@ add_test(runUnitTests runUnitTests)
 # Install the executable
 install(TARGETS pixelsort DESTINATION bin)
 
+####################################
+# CPack stuff
+include(CPack)
+
+
+
