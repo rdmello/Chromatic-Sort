@@ -1,4 +1,9 @@
 
+#include <iostream>
+#include <cmath>
+
+#include <QImage>
+
 #include "PixelSortApp.hpp"
 
 PixelSortApp::PixelSortApp(QApplication* parent):
@@ -10,8 +15,10 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     vbox(&dockwidget_mid),
     importbutton("Import", &dockwidget_mid),
     fileimport(this),
+    exportbutton("Export", &dockwidget_mid),
+    fileexport(this),
     formlayout(),
-    importbutton2("Import", &dockwidget_mid),
+    sortbutton("PixelSort", &dockwidget_mid),
     quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
 {
@@ -30,24 +37,34 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     dockwidget.setFeatures(QDockWidget::NoDockWidgetFeatures);
     dockwidget.setWidget(&dockwidget_mid);
         
-    // add import button to vbox
+    // add import and export button to vbox
     vbox.addWidget(&importbutton);
-    
+    vbox.addWidget(&exportbutton);
+   
+    // file import dialog settings
     fileimport.setFileMode(QFileDialog::ExistingFile);
     fileimport.setAcceptMode(QFileDialog::AcceptOpen);
     fileimport.setNameFilter("Images (*.png *.tiff)");
     fileimport.fileSelected(imageFilePath);
 
-    // Connect actual events
+    // file export dialog settings
+    fileexport.setFileMode(QFileDialog::AnyFile);
+    fileexport.setAcceptMode(QFileDialog::AcceptSave);
+
+    // Connect actual import button events
     QObject::connect(&importbutton, SIGNAL(clicked()), &fileimport, SLOT(exec()));
     QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), this, SLOT(reloadImage(QString)));
+ 
+    // Connect actual export button events
+    QObject::connect(&exportbutton, SIGNAL(clicked()), &fileexport, SLOT(exec()));
+    QObject::connect(&fileexport, SIGNAL(fileSelected(QString)), this, SLOT(writeImage(QString)));
  
     // Set up the form layout widget 
     vbox.addLayout(&formlayout);
     
-    // add import button to formlayout
-    formlayout.addRow("Import2", &importbutton2);
-    QObject::connect(&importbutton2, SIGNAL(clicked()), appPtr, SLOT(quit()));
+    // add sort button to formlayout
+    formlayout.addRow("Do sort", &sortbutton);
+    QObject::connect(&sortbutton, SIGNAL(clicked()), this, SLOT(sortButtonAction()));
  
     // add quit button to vbox
     vbox.addWidget(&quitbutton);
@@ -66,6 +83,11 @@ void PixelSortApp::reloadImage(QString fileStr) {
     QPixmap newImg(fileStr);
     mainImg->setPixmap(newImg);
     updateScene(newImg);
+  
+    // Read image using imagemagick
+    img.read(fileStr.toStdString());
+    img.modifyImage();
+    img.type(Magick::TrueColorType);
 }
 
 void PixelSortApp::updateScene(QPixmap& newImg) {
@@ -74,3 +96,47 @@ void PixelSortApp::updateScene(QPixmap& newImg) {
     view.update();
     view.fitInView(mainImg, Qt::KeepAspectRatio);
 }
+
+void PixelSortApp::writeImage(QString fileStr) {
+
+    std::cout << "Written Image: " << fileStr.toStdString() << std::endl;
+    img.write(fileStr.toStdString());
+    // QPixmap newImg(fileStr);
+    // mainImg->setPixmap(newImg);
+    // updateScene(newImg);
+}
+
+void PixelSortApp::sortButtonAction() {
+   
+    /* Read pixelvector */
+    std::cout << "Reading pixelvector..." << std::endl;
+    PS::PixelVector pv(img, PS::BoxCoordinate(0, 0, img.columns(), img.rows())); 
+    
+    /* Sort and Apply */
+    std::cout << "Sorting pixelvector..." << std::endl;
+    PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, PS::AllMatcher(), PS::Comparator(), 
+        [](const PS::Pixel& p1, const PS::Pixel& p2) {
+        PS::Pixel p(p1);
+        p.red(p2.red());
+        p.blue(p2.blue());
+        return p;
+    }); 
+
+    /* Updating Qt::QPixmap */
+    std::cout << "Converting pixelvector to QImage..." << std::endl;
+    QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
+    QRgb value;
+    Magick::ColorRGB mcol;
+    for (int i = 0; i < img.rows(); ++i) {
+        for (int j = 0; j < img.columns(); ++j) {
+            mcol = Magick::ColorRGB(img.pixelColor(j, i));
+            value = qRgb(std::floor(256*mcol.red()), std::floor(256*mcol.green()), std::floor(256*mcol.blue()));
+            qimg.setPixel(j, i, value);
+        }
+    }
+    
+    QPixmap newImg = QPixmap::fromImage(qimg);
+    mainImg->setPixmap(newImg);
+    updateScene(newImg);
+}
+

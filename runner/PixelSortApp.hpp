@@ -14,6 +14,13 @@
 #include <QFileDialog>
 #include <QPushButton>
 
+// Magick++ includes
+#include <Magick++.h>
+
+// PixelSort includes
+#include "PixelSort.hpp"
+namespace PS = PixelSort;
+
 
 class PixelSortApp : public QMainWindow
 {
@@ -34,17 +41,24 @@ private:
     QVBoxLayout vbox;
     QPushButton importbutton;
     QFileDialog fileimport;
+    QPushButton exportbutton;
+    QFileDialog fileexport;
     
     QFormLayout formlayout;
-    QPushButton importbutton2;
+    QPushButton sortbutton;
       
     QPushButton quitbutton;
         
     QMenu fileMenu; 
+    
+    // Image and PixelSort resources
+    Magick::Image img;
 
 public slots:
     void reloadImage(QString);
+    void writeImage(QString);
     void updateScene(QPixmap&);
+    void sortButtonAction();
 };
 
 
