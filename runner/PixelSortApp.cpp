@@ -86,8 +86,7 @@ void PixelSortApp::reloadImage(QString fileStr) {
   
     // Read image using imagemagick
     img.read(fileStr.toStdString());
-    img.modifyImage();
-    img.type(Magick::TrueColorType);
+    opts.setImage(&img);
 }
 
 void PixelSortApp::updateScene(QPixmap& newImg) {
@@ -108,29 +107,23 @@ void PixelSortApp::writeImage(QString fileStr) {
 
 void PixelSortApp::sortButtonAction() {
    
-    /* Read pixelvector */
-    std::cout << "Reading pixelvector..." << std::endl;
-    PS::PixelVector pv(img, PS::BoxCoordinate(0, 0, img.columns(), img.rows())); 
-    
     /* Sort and Apply */
     std::cout << "Sorting pixelvector..." << std::endl;
-    PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, PS::AllMatcher(), PS::Comparator(), 
-        [](const PS::Pixel& p1, const PS::Pixel& p2) {
-        PS::Pixel p(p1);
-        p.red(p2.red());
-        p.blue(p2.blue());
-        return p;
-    }); 
+    opts.doSort();
 
     /* Updating Qt::QPixmap */
     std::cout << "Converting pixelvector to QImage..." << std::endl;
     QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
     QRgb value;
     Magick::ColorRGB mcol;
-    for (int i = 0; i < img.rows(); ++i) {
-        for (int j = 0; j < img.columns(); ++j) {
+    for (unsigned int i = 0; i < img.rows(); ++i) {
+        for (unsigned int j = 0; j < img.columns(); ++j) {
             mcol = Magick::ColorRGB(img.pixelColor(j, i));
-            value = qRgb(std::floor(256*mcol.red()), std::floor(256*mcol.green()), std::floor(256*mcol.blue()));
+            value = qRgb(
+                std::floor(256*mcol.red()), 
+                std::floor(256*mcol.green()), 
+                std::floor(256*mcol.blue())
+            );
             qimg.setPixel(j, i, value);
         }
     }

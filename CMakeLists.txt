@@ -91,6 +91,7 @@ add_subdirectory(runner)
 add_executable(
     pixelsort 
     runner/PixelSortApp.cpp
+    runner/PixelSortOptions.cpp
     runner/interactive.cpp
 )
 

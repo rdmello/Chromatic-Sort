@@ -18,9 +18,7 @@
 #include <Magick++.h>
 
 // PixelSort includes
-#include "PixelSort.hpp"
-namespace PS = PixelSort;
-
+#include "PixelSortOptions.hpp"
 
 class PixelSortApp : public QMainWindow
 {
@@ -53,6 +51,7 @@ private:
     
     // Image and PixelSort resources
     Magick::Image img;
+    PixelSortOptions opts;
 
 public slots:
     void reloadImage(QString);

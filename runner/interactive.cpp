@@ -40,32 +40,11 @@
 
 #include <Magick++.h>
 
-#include "PixelSort.hpp"
-namespace PS = PixelSort;
-
 #include "boost/program_options.hpp"
 namespace po = boost::program_options;
 
 #include "PixelSortApp.hpp"
-
-/* Testing QApplication and QLabel on macOS */
-/* Helper function which generates the correct Applicator
- * for pixelsorting 
- */
-template<bool T1, bool T2, bool T3>
-PS::Pixel sendColor(const PS::Pixel& p1, const PS::Pixel& p2) {
-    PS::Pixel p(p1);
-    if (T1) { 
-        p.red(p2.red());
-    }
-    if (T2) {
-        p.green(p2.green());
-    }
-    if (T3) {
-        p.blue(p2.blue());
-    }
-    return p;
-}
+#include "PixelSortOptions.hpp"
 
 /* Logging function
  * Verbosity:
@@ -213,6 +192,7 @@ int main (int argc, char* argv[]) {
     /* Necessary variables */
     std::string infile, outfile;
     Magick::Image img;
+    PixelSortOptions opts;
 
     /* 
      * Print input file name if one is found 
@@ -223,8 +203,6 @@ int main (int argc, char* argv[]) {
 
         /* Define a default output filename */ 
         outfile = infile;
-        // int dot_idx = outfile.find_last_of(".");
-        // outfile.insert(dot_idx, "_out");
         logger.log(3, "Output filename default: " + outfile);
     } else {
         logger.log(-1, "No input file found, exiting....");
@@ -237,286 +215,8 @@ int main (int argc, char* argv[]) {
     if (vm.count("output")) {
         outfile = vm["output"].as<std::string>();
         logger.log(2, "Output file is: " + outfile);
-    } 
-
-    /* 
-     * Read and set sort comparator
-     */
-    PS::WeightedComparator comp = PS::WeightedComparator(1, 1, 1);
-    
-    if (vm.count("sort")) {
-        std::string colstr = vm["sort"].as<std::string>();
-        if (colstr == "R") {
-            comp = PS::WeightedComparator(1, 0, 0);
-            logger.log(3, "Red Comparator set");
-        } 
-        else if (colstr == "G") {
-            comp = PS::WeightedComparator(0, 1, 0);
-            logger.log(3, "Green Comparator set");
-        }
-        else if (colstr == "B") {
-            comp = PS::WeightedComparator(0, 0, 1);
-            logger.log(3, "Blue Comparator set");
-        }
-        else if ((colstr == "RG")||(colstr == "GR")) {
-            comp = PS::WeightedComparator(1, 1, 0);
-            logger.log(3, "Red+Green Comparator set");
-        }
-        else if ((colstr == "RB")||(colstr == "BR")) {
-            comp = PS::WeightedComparator(1, 0, 1);
-            logger.log(3, "Red+Blue Comparator set");
-        }
-        else if ((colstr == "GB")||(colstr == "BG")) {
-            comp = PS::WeightedComparator(0, 1, 1);
-            logger.log(3, "Green+Blue Comparator set");
-        } 
-        else {
-            logger.log(3, "Comparator statement did not match, AllSumComparator set");
-        }
     }
     
-    /* 
-     * Read and set color applied by sort comparator
-     */
-    PS::ApplyFcn applyFcn = sendColor<true, true, true>;
-    if (vm.count("color")) {
-        std::string colstr = vm["color"].as<std::string>();
-        if (colstr == "R") {
-            applyFcn = sendColor<true, false, false>;
-            logger.log(3, "Red Applicator set");
-        } 
-        else if (colstr == "G") {
-            applyFcn = sendColor<false, true, false>;
-            logger.log(3, "Green Applicator set");
-        }
-        else if (colstr == "B") {
-            applyFcn = sendColor<false, false, true>;
-            logger.log(3, "Blue Applicator set");
-        }
-        else if ((colstr == "RG")||(colstr == "GR")) {
-            applyFcn = sendColor<true, true, false>;
-            logger.log(3, "Red+Green Applicator set");
-        }
-        else if ((colstr == "RB")||(colstr == "BR")) {
-            applyFcn = sendColor<true, false, true>;
-            logger.log(3, "Red+Blue Applicator set");
-        }
-        else if ((colstr == "GB")||(colstr == "BG")) {
-            applyFcn = sendColor<false, true, true>;
-            logger.log(3, "Green+Blue Applicator set");
-        } 
-        else {
-            logger.log(3, "Applicator statement did not match, AllApplicator set");
-        }
-    }
-
-    double rMin = 0, rMax = 1;
-    double gMin = 0, gMax = 1;
-    double bMin = 0, bMax = 1;
-
-    if (vm.count("red")) {
-        std::string redstr = vm["red"].as<std::string>();
-        
-        for (auto&& i: redstr) {
-            if (i == ',') i = ' ';
-        }
-        std::istringstream iss{redstr};
-        std::vector<std::string> redlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<double> redargs;
-        for (auto&& i: redlist) {
-            redargs.push_back(std::stod(i));
-        }
-
-        rMin = redargs[0]; rMax = redargs[1];
-        logger.log(3, "Red matcher definition found: "
-                  + std::to_string(rMin)  + ", " + std::to_string(rMax));
-    }
-    
-    if (vm.count("green")) {
-        std::string greenstr = vm["green"].as<std::string>();
-        
-        for (auto&& i: greenstr) {
-            if (i == ',') i = ' ';
-        }
-        std::istringstream iss{greenstr};
-        std::vector<std::string> greenlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<double> greenargs;
-        for (auto&& i: greenlist) {
-            greenargs.push_back(std::stod(i));
-        }
-        gMin = greenargs[0]; gMax = greenargs[1];
-        logger.log(3, "Green matcher definition found: "
-                  + std::to_string(gMin) + ", " + std::to_string(gMax) );
-    }
-    
-    if (vm.count("blue")) {
-        std::string bluestr = vm["blue"].as<std::string>();
-        
-        for (auto&& i: bluestr) {
-            if (i == ',') i = ' ';
-        }
-        std::istringstream iss{bluestr};
-        std::vector<std::string> bluelist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<double> blueargs;
-        for (auto&& i: bluelist) {
-            blueargs.push_back(std::stod(i));
-        }
-        bMin = blueargs[0]; bMax = blueargs[1];
-        logger.log(3, "Blue matcher definition found: "
-                  + std::to_string(bMin) + ", " + std::to_string(bMax));
-    }
-
-    if (vm.count("mean")) {
-        std::string bwstr = vm["mean"].as<std::string>();
-        
-        for (auto&& i: bwstr) {
-            if (i == ',') i = ' ';
-        }
-        std::istringstream iss{bwstr};
-        std::vector<std::string> bwlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<double> bwargs;
-        for (auto&& i: bwlist) {
-            bwargs.push_back(std::stod(i));
-        }
-        rMin = bwargs[0]; rMax = bwargs[1];
-        gMin = bwargs[0]; gMax = bwargs[1];
-        bMin = bwargs[0]; bMax = bwargs[1];
-        logger.log(3, "Black-and-white matcher definition found: "
-                  + std::to_string(bMin) + ", " + std::to_string(bMax));
-    }
-
-    /* Read geometric selectors, if defined */
-    std::vector<PS::RectangleMatcher> quadMatchers;
-    std::vector<PS::CircleMatcher>    diskMatchers;
-    std::vector<PS::LineMatcher>      lineMatchers;
-
-    if (vm.count("quad")) {
-        std::string boxstr = vm["quad"].as<std::string>();
-        for (auto&& i: boxstr) {
-            if (i == ',') {
-                i = ' ';
-            }
-        }
-        std::istringstream iss{boxstr};
-        std::vector<std::string> boxlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<int> boxargs;
-        for (auto&& i: boxlist) {
-            boxargs.push_back(std::stoi(i));
-        }
-
-        logger.log(2, "Box definition found");
-
-        if (boxargs.size() == 4) {
-            quadMatchers.push_back(PS::RectangleMatcher(PS::BoxCoordinate(
-                boxargs[0], boxargs[1], boxargs[2], boxargs[3]
-            )));
-        }
-    }
-    
-    if (vm.count("disk")) {
-        std::string boxstr = vm["disk"].as<std::string>();
-        for (auto&& i: boxstr) {
-            if (i == ',') {
-                i = ' ';
-            }
-        }
-        std::istringstream iss{boxstr};
-        std::vector<std::string> boxlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<int> boxargs;
-        for (auto&& i: boxlist) {
-            boxargs.push_back(std::stoi(i));
-        }
-
-        logger.log(2, "Disk definition found: " + 
-                       std::to_string(boxargs[0]) + ", " +
-                       std::to_string(boxargs[1]) + ", " +
-                       std::to_string(boxargs[2]));
-
-        if (boxargs.size() == 3) {
-            diskMatchers.push_back(PS::CircleMatcher(
-                PS::Coordinate(boxargs[0], boxargs[1]), boxargs[2]));
-        }
-    }
-    
-    if (vm.count("line")) {
-        std::string boxstr = vm["line"].as<std::string>();
-        for (auto&& i: boxstr) {
-            if (i == ',') {
-                i = ' ';
-            }
-        }
-        std::istringstream iss{boxstr};
-        std::vector<std::string> boxlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-        std::vector<int> boxargs;
-        for (auto&& i: boxlist) {
-            boxargs.push_back(std::stoi(i));
-        }
-
-        logger.log(2, "Line definition found");
-
-        if (boxargs.size() == 5) {
-            lineMatchers.push_back(PS::LineMatcher(
-                PS::Coordinate(boxargs[0], boxargs[1]), 
-                PS::Coordinate(boxargs[2], boxargs[3]), boxargs[4]));
-        }
-    }
-
-    /* 
-     * Parse and set sort angle directives
-     */
-    double angle = 0;
-
-    if (vm.count("theta")) 
-    {
-        std::string str = vm["theta"].as<std::string>();
-        angle = std::stod(str);
-        logger.log(3, "Found theta directive: " + std::to_string(angle));
-    }
-
-    /* 
-     * Parse and set Xrepeat and Yrepeat parameters
-     */
-    double Xstart = 0, Xpitch = 100, Xend = 0;
-    double Ystart = 0, Ypitch = 100, Yend = 0;
-    if (vm.count("Xrepeat"))
-    {
-        std::string Xstr = vm["Xrepeat"].as<std::string>();
-        for (auto&& i: Xstr) {
-            if (i == ',') {
-                i = ' ';
-            }
-        }
-        std::istringstream iss{Xstr};
-        std::vector<std::string> Xlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-
-        Xstart = std::stoi(Xlist[0]);
-        Xpitch = std::stoi(Xlist[1]);
-        Xend   = std::stoi(Xlist[2]);
-
-        logger.log(2, "X-Repeat definition found: (" + std::to_string(Xstart)
-            + "," + std::to_string(Xpitch) + "," + std::to_string(Xend) + ")");
-    }
-
-    if (vm.count("Yrepeat"))
-    {
-        std::string Ystr = vm["Yrepeat"].as<std::string>();
-        for (auto&& i: Ystr) {
-            if (i == ',') {
-                i = ' ';
-            }
-        }
-        std::istringstream iss{Ystr};
-        std::vector<std::string> Ylist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
-
-        Ystart = std::stoi(Ylist[0]);
-        Ypitch = std::stoi(Ylist[1]);
-        Yend   = std::stoi(Ylist[2]);
-
-        logger.log(2, "Y-Repeat definition found: (" + std::to_string(Ystart)
-            + "," + std::to_string(Ypitch) + "," + std::to_string(Yend) + ")");
-
-    }
-
     /* 
      * Read image 
      */
@@ -538,79 +238,244 @@ int main (int argc, char* argv[]) {
         logger.log(-1, std::string("Error while reading image file") + error.what());
     }
 
-    Magick::ColorRGB cMin(rMin, gMin, bMin);
-    Magick::ColorRGB cMax(rMax, gMax, bMax);
-
-    const PS::Matcher &mat = PS::RGBBandMatcher{cMin, cMax};
+    /* Set PixelSortOptions Image */
+    opts.setImage(&img);
 
     /* 
-     * STAGE 3: Start PixelSorting 
+     * Read and set sort comparator
      */
-    img.modifyImage();
-    img.type(Magick::TrueColorType);
-
-    Xstart = quadMatchers.size() >= 1 ? quadMatchers[0].bounds.x : 0;
-    Ystart = quadMatchers.size() >= 1 ? quadMatchers[0].bounds.y : 0;
-
-    Xstart = diskMatchers.size() >= 1 ? diskMatchers[0].center.x - diskMatchers[0].radius: Xstart;
-    Ystart = diskMatchers.size() >= 1 ? diskMatchers[0].center.y - diskMatchers[0].radius: Ystart;
-
-    Xstart = lineMatchers.size() >= 1 ? lineMatchers[0].start.x : Xstart;
-    Ystart = lineMatchers.size() >= 1 ? lineMatchers[0].start.y : Ystart;
-
-    if (vm.count("Xrepeat") < 1) {
-        Xend = img.columns();
-        Xpitch = img.columns();
-    }
-    if (vm.count("Yrepeat") < 1) {
-        Yend = img.rows();
-        Ypitch = img.rows();
-    }
-
-    /* Select a minimal region within the image */
-    for (double coordX = Xstart; coordX < Xend; coordX += Xpitch) {
-        for (double coordY = Ystart; coordY < Yend; coordY += Ypitch) {
-            logger.log(2, "On iteration: (" + std::to_string(coordX) + 
-                "," + std::to_string(coordY) + ")"); 
-
-            if (quadMatchers.size() >= 1) {
-                logger.log(3, "Using user-defined selector for minimal image read");
-            } else {
-                quadMatchers.push_back(PS::RectangleMatcher(PS::BoxCoordinate(coordX, coordY, Xpitch, Ypitch)));
-                logger.log(3, "Using default selector for image read");
-            }
-            quadMatchers[0].bounds.x = coordX;
-            quadMatchers[0].bounds.y = coordY;
-
-            /* Build a PixelVector from the image's pixels */
-            PS::PixelVector pv(img, 
-                            PS::BoxCoordinate(0, 0, img.columns(), img.rows()),
-                            quadMatchers[0]); 
-        
-            /* Apply more selectors */
-            for (PS::CircleMatcher& circ : diskMatchers) {
-                circ.center.x = coordX + circ.radius;
-                circ.center.y = coordY + circ.radius;
-                pv.match(circ);  
-            }
-            for (PS::LineMatcher& line : lineMatchers) {
-                line.start.x = coordX;
-                line.start.y = coordY;
-                pv.match(line);  
-                line.end.x += Xpitch;
-                line.end.y += Ypitch;
-            }
-
-            /* Apply color matchers */
-            // pv.match(mat);
-
-            /* Rotate pixelvector */
-            pv.sort(PS::AngleComparator(angle));
-
-            /* Sort and Apply */
-            PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, mat, comp, applyFcn); 
+    if (vm.count("sort")) {
+        std::string colstr = vm["sort"].as<std::string>();
+        if (colstr == "R") {
+            opts.sortColors[1] = false;
+            opts.sortColors[2] = false;
+            logger.log(3, "Red Comparator set");
+        } 
+        else if (colstr == "G") {
+            opts.sortColors[0] = false;
+            opts.sortColors[2] = false;
+            logger.log(3, "Green Comparator set");
+        }
+        else if (colstr == "B") {
+            opts.sortColors[0] = false;
+            opts.sortColors[1] = false;
+            logger.log(3, "Blue Comparator set");
+        }
+        else if ((colstr == "RG")||(colstr == "GR")) {
+            opts.sortColors[2] = false;
+            logger.log(3, "Red+Green Comparator set");
+        }
+        else if ((colstr == "RB")||(colstr == "BR")) {
+            opts.sortColors[1] = false;
+            logger.log(3, "Red+Blue Comparator set");
+        }
+        else if ((colstr == "GB")||(colstr == "BG")) {
+            opts.sortColors[0] = false;
+            logger.log(3, "Green+Blue Comparator set");
+        } 
+        else {
+            logger.log(3, "Comparator statement did not match, AllSumComparator set");
         }
     }
+    
+    /* 
+     * Read and set color applied by sort comparator
+     */
+    if (vm.count("color")) {
+        std::string colstr = vm["color"].as<std::string>();
+        if (colstr == "R") {
+            opts.moveColors[1] = false;
+            opts.moveColors[2] = false;
+            logger.log(3, "Red Applicator set");
+        } 
+        else if (colstr == "G") {            
+            opts.moveColors[0] = false;
+            opts.moveColors[2] = false;
+            logger.log(3, "Green Applicator set");
+        }
+        else if (colstr == "B") {
+            opts.moveColors[0] = false;
+            opts.moveColors[1] = false;
+            logger.log(3, "Blue Applicator set");
+        }
+        else if ((colstr == "RG")||(colstr == "GR")) {
+            opts.moveColors[2] = false;
+            logger.log(3, "Red+Green Applicator set");
+        }
+        else if ((colstr == "RB")||(colstr == "BR")) {
+            opts.moveColors[1] = false;
+            logger.log(3, "Red+Blue Applicator set");
+        }
+        else if ((colstr == "GB")||(colstr == "BG")) {
+            opts.moveColors[0] = false;
+            logger.log(3, "Green+Blue Applicator set");
+        } 
+        else {
+            logger.log(3, "Applicator statement did not match, AllApplicator set");
+        }
+    }
+
+    /* 
+     * Read color matcher 
+     */
+    if (vm.count("red")) {
+        std::string redstr = vm["red"].as<std::string>();
+        
+        for (auto&& i: redstr) {
+            if (i == ',') i = ' ';
+        }
+        std::istringstream iss{redstr};
+        std::vector<std::string> redlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+        std::vector<double> redargs;
+        for (auto&& i: redlist) {
+            redargs.push_back(std::stod(i));
+        }
+
+        opts.colorMatcher[0] = redargs[0]; 
+        opts.colorMatcher[1] = redargs[1]; 
+        logger.log(3, "Red matcher definition found: "
+                  + std::to_string(redargs[0])  + ", " + std::to_string(redargs[1]));
+    }
+    
+    if (vm.count("green")) {
+        std::string greenstr = vm["green"].as<std::string>();
+        
+        for (auto&& i: greenstr) {
+            if (i == ',') i = ' ';
+        }
+        std::istringstream iss{greenstr};
+        std::vector<std::string> greenlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+        std::vector<double> greenargs;
+        for (auto&& i: greenlist) {
+            greenargs.push_back(std::stod(i));
+        }
+        opts.colorMatcher[2] = greenargs[0]; 
+        opts.colorMatcher[3] = greenargs[1]; 
+
+        logger.log(3, "Green matcher definition found: "
+                  + std::to_string(greenargs[0]) + ", " + std::to_string(greenargs[1]) );
+    }
+    
+    if (vm.count("blue")) {
+        std::string bluestr = vm["blue"].as<std::string>();
+        
+        for (auto&& i: bluestr) {
+            if (i == ',') i = ' ';
+        }
+        std::istringstream iss{bluestr};
+        std::vector<std::string> bluelist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+        std::vector<double> blueargs;
+        for (auto&& i: bluelist) {
+            blueargs.push_back(std::stod(i));
+        }
+        opts.colorMatcher[4] = blueargs[0]; 
+        opts.colorMatcher[5] = blueargs[1]; 
+
+        logger.log(3, "Blue matcher definition found: "
+                  + std::to_string(blueargs[0]) + ", " + std::to_string(blueargs[1]));
+    }
+
+    if (vm.count("mean")) {
+        std::string bwstr = vm["mean"].as<std::string>();
+        
+        for (auto&& i: bwstr) {
+            if (i == ',') i = ' ';
+        }
+        std::istringstream iss{bwstr};
+        std::vector<std::string> bwlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+        std::vector<double> bwargs;
+        for (auto&& i: bwlist) {
+            bwargs.push_back(std::stod(i));
+        }
+        opts.colorMatcher[0] = bwargs[0]; 
+        opts.colorMatcher[1] = bwargs[1]; 
+        opts.colorMatcher[2] = bwargs[0]; 
+        opts.colorMatcher[3] = bwargs[1]; 
+        opts.colorMatcher[4] = bwargs[0]; 
+        opts.colorMatcher[5] = bwargs[1]; 
+
+        logger.log(3, "Black-and-white matcher definition found: "
+                  + std::to_string(bwargs[0]) + ", " + std::to_string(bwargs[1]));
+    }
+
+    /* Read geometric selectors, if defined */
+    if (vm.count("quad")) {
+        std::string boxstr = vm["quad"].as<std::string>();
+        for (auto&& i: boxstr) {
+            if (i == ',') {
+                i = ' ';
+            }
+        }
+        std::istringstream iss{boxstr};
+        std::vector<std::string> boxlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+        std::vector<int> boxargs;
+        for (auto&& i: boxlist) {
+            boxargs.push_back(std::stoi(i));
+        }
+
+        logger.log(2, "Box definition found");
+
+        if (boxargs.size() == 4) {
+            opts.rect[0] = boxargs[0];
+            opts.rect[1] = boxargs[1]; 
+            opts.rect[2] = boxargs[2]; 
+            opts.rect[3] = boxargs[3];
+        }
+    }
+    
+    /* 
+     * Parse and set sort angle directives
+     */
+    if (vm.count("theta")) 
+    {
+        std::string str = vm["theta"].as<std::string>();
+        opts.theta = std::stod(str);
+        logger.log(3, "Found theta directive: " + std::to_string(opts.theta));
+    }
+
+    /* 
+     * Parse and set Xrepeat and Yrepeat parameters
+     */
+    if (vm.count("Xrepeat"))
+    {
+        std::string Xstr = vm["Xrepeat"].as<std::string>();
+        for (auto&& i: Xstr) {
+            if (i == ',') {
+                i = ' ';
+            }
+        }
+        std::istringstream iss{Xstr};
+        std::vector<std::string> Xlist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+
+        opts.Xrepeat[0] = std::stoi(Xlist[0]);
+        opts.Xrepeat[1] = std::stoi(Xlist[1]);
+        opts.Xrepeat[2] = std::stoi(Xlist[2]);
+
+        logger.log(2, "X-Repeat definition found: (" + std::to_string(opts.Xrepeat[0])
+            + "," + std::to_string(opts.Xrepeat[1]) + "," + std::to_string(opts.Xrepeat[2]) + ")");
+    }
+
+    if (vm.count("Yrepeat"))
+    {
+        std::string Ystr = vm["Yrepeat"].as<std::string>();
+        for (auto&& i: Ystr) {
+            if (i == ',') {
+                i = ' ';
+            }
+        }
+        std::istringstream iss{Ystr};
+        std::vector<std::string> Ylist{std::istream_iterator<std::string>{iss},                                                   std::istream_iterator<std::string>{}};
+
+        opts.Yrepeat[0] = std::stoi(Ylist[0]);
+        opts.Yrepeat[1] = std::stoi(Ylist[1]);
+        opts.Yrepeat[2] = std::stoi(Ylist[2]);
+
+        logger.log(2, "Y-Repeat definition found: (" + std::to_string(opts.Yrepeat[0])
+            + "," + std::to_string(opts.Yrepeat[1]) + "," + std::to_string(opts.Yrepeat[2]) + ")");
+
+    }
+
+    opts.doSort();
 
     /* Write to output file */
     logger.log(2, "Writing to outfile: " + outfile);
