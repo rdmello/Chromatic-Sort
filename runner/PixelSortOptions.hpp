@@ -7,6 +7,11 @@ namespace PS = PixelSort;
 #ifndef _PIXELSORT_RUNNER_SORTOPTIONS_
 #define _PIXELSORT_RUNNER_SORTOPTIONS_
 
+struct Notifiable
+{
+    virtual void notify(const char*) = 0;
+};
+
 struct PixelSortOptions 
 {
     Magick::Image* img;
@@ -20,6 +25,9 @@ struct PixelSortOptions
 
     double Xrepeat[3];
     double Yrepeat[3];
+
+    // Call this function with status updates
+    Notifiable* notifyMe;
 
     PixelSortOptions();
     ~PixelSortOptions();

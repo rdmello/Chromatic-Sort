@@ -80,10 +80,12 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // menuBar()->setNativeMenuBar(false);
 
     // Set up statusbar (at bottom of window)
+    opts.notifyMe = this;
     statusBar()->showMessage("Ready");
 }
 
-void PixelSortApp::reloadImage(QString fileStr) {
+void PixelSortApp::reloadImage(QString fileStr) 
+{
     statusBar()->showMessage("Reading image");
     QPixmap newImg(fileStr);
     mainImg->setPixmap(newImg);
@@ -102,7 +104,8 @@ void PixelSortApp::updateScene(QPixmap& newImg) {
     view.fitInView(mainImg, Qt::KeepAspectRatio);
 }
 
-void PixelSortApp::writeImage(QString fileStr) {
+void PixelSortApp::writeImage(QString fileStr) 
+{
     statusBar()->showMessage("Writing image");
     img.write(fileStr.toStdString());
     statusBar()->showMessage("Successfully written image: " + fileStr);
@@ -111,14 +114,14 @@ void PixelSortApp::writeImage(QString fileStr) {
     // updateScene(newImg);
 }
 
-void PixelSortApp::sortButtonAction() {
-   
+void PixelSortApp::sortButtonAction() 
+{
     /* Sort and Apply */
-    std::cout << "Sorting pixelvector..." << std::endl;
+    statusBar()->showMessage("Sorting image...");
     opts.doSort();
 
     /* Updating Qt::QPixmap */
-    std::cout << "Converting pixelvector to QImage..." << std::endl;
+    statusBar()->showMessage("Writing into QPixmap");
     QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
     QColor value;
     Magick::ColorRGB mcol;
@@ -137,5 +140,10 @@ void PixelSortApp::sortButtonAction() {
     QPixmap newImg = QPixmap::fromImage(qimg);
     mainImg->setPixmap(newImg);
     updateScene(newImg);
+    statusBar()->showMessage("Ready");
 }
 
+void PixelSortApp::notify(const char* str)
+{
+    statusBar()->showMessage(str);
+}

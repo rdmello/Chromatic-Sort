@@ -22,12 +22,13 @@
 // PixelSort includes
 #include "PixelSortOptions.hpp"
 
-class PixelSortApp : public QMainWindow
+class PixelSortApp : public QMainWindow, public Notifiable
 {
     Q_OBJECT
 
 public:
     PixelSortApp(QApplication* appPtr);
+    void notify(const char*);
 
 private:
     QApplication* appPtr;

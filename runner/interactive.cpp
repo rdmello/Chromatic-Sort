@@ -54,7 +54,7 @@ namespace po = boost::program_options;
  *   logLevel 0: silent, except for errors
  * maybe I should replace this with a real library at some point 
  */
-class Logger {
+class Logger: public Notifiable {
     int level;
 public:
 
@@ -82,6 +82,10 @@ public:
         } else if (level <= this->level) {
             std::cout << level << ": " << str << std::endl;
         }
+    }
+
+    virtual void notify(const char* str) {
+        log(3, str);
     }
 };
 
@@ -240,6 +244,7 @@ int main (int argc, char* argv[]) {
 
     /* Set PixelSortOptions Image */
     opts.setImage(&img);
+    opts.notifyMe = &logger;
 
     /* 
      * Read and set sort comparator

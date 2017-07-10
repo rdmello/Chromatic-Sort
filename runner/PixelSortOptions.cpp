@@ -80,8 +80,9 @@ void PixelSortOptions::doSort()
 
             quad.bounds.x = coordX;
             quad.bounds.y = coordY;
-            
-            std::cout << "Block: " << coordX << ", " << coordY << std::endl;
+          
+            std::string str("PixelSorting block: " + std::to_string(coordX) + ", " + std::to_string(coordY));
+            notifyMe->notify(str.c_str());
 
             /* Build a PixelVector from the image's pixels */
             PS::PixelVector pv(
