@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
 
 #include <QImage>
 
@@ -32,8 +33,8 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     this->setCentralWidget(&view);
         
     // set up dockwidget
-    this->addDockWidget(Qt::LeftDockWidgetArea, &dockwidget);
-    dockwidget.setAllowedAreas(Qt::LeftDockWidgetArea);
+    this->addDockWidget(Qt::RightDockWidgetArea, &dockwidget);
+    dockwidget.setAllowedAreas(Qt::RightDockWidgetArea);
     dockwidget.setFeatures(QDockWidget::NoDockWidgetFeatures);
     dockwidget.setWidget(&dockwidget_mid);
         
@@ -73,13 +74,17 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // Set up menubar
     fileMenu.addAction("Item 1");
     fileMenu.addAction("Item 2");
-    this->menuBar()->addMenu(&fileMenu);
-    this->menuBar()->addAction(fileMenu.menuAction());
-    this->menuBar()->show();
-    // this->menuBar()->setNativeMenuBar(false);
+    menuBar()->addMenu(&fileMenu);
+    menuBar()->addAction(fileMenu.menuAction());
+    menuBar()->show();
+    // menuBar()->setNativeMenuBar(false);
+
+    // Set up statusbar (at bottom of window)
+    statusBar()->showMessage("Ready");
 }
 
 void PixelSortApp::reloadImage(QString fileStr) {
+    statusBar()->showMessage("Reading image");
     QPixmap newImg(fileStr);
     mainImg->setPixmap(newImg);
     updateScene(newImg);
@@ -87,6 +92,7 @@ void PixelSortApp::reloadImage(QString fileStr) {
     // Read image using imagemagick
     img.read(fileStr.toStdString());
     opts.setImage(&img);
+    statusBar()->showMessage("New image successfully loaded: " + fileStr);
 }
 
 void PixelSortApp::updateScene(QPixmap& newImg) {
@@ -97,9 +103,9 @@ void PixelSortApp::updateScene(QPixmap& newImg) {
 }
 
 void PixelSortApp::writeImage(QString fileStr) {
-
-    std::cout << "Written Image: " << fileStr.toStdString() << std::endl;
+    statusBar()->showMessage("Writing image");
     img.write(fileStr.toStdString());
+    statusBar()->showMessage("Successfully written image: " + fileStr);
     // QPixmap newImg(fileStr);
     // mainImg->setPixmap(newImg);
     // updateScene(newImg);
@@ -114,17 +120,17 @@ void PixelSortApp::sortButtonAction() {
     /* Updating Qt::QPixmap */
     std::cout << "Converting pixelvector to QImage..." << std::endl;
     QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
-    QRgb value;
+    QColor value;
     Magick::ColorRGB mcol;
     for (unsigned int i = 0; i < img.rows(); ++i) {
         for (unsigned int j = 0; j < img.columns(); ++j) {
             mcol = Magick::ColorRGB(img.pixelColor(j, i));
-            value = qRgb(
-                std::floor(256*mcol.red()), 
-                std::floor(256*mcol.green()), 
-                std::floor(256*mcol.blue())
+            value = QColor(
+                std::floor(255*mcol.red()), 
+                std::floor(255*mcol.green()), 
+                std::floor(255*mcol.blue())
             );
-            qimg.setPixel(j, i, value);
+            qimg.setPixel(j, i, value.rgb());
         }
     }
     

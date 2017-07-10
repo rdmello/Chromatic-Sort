@@ -3,12 +3,14 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QMenuBar>
+#include <QStatusBar>
 #include <QMenu>
 #include <QFormLayout>
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPixmap>
+#include <QColor>
 #include <QGraphicsPixmapItem>
 
 #include <QFileDialog>

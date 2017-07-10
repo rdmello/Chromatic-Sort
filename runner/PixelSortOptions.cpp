@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include "PixelSortOptions.hpp"
 
 /* Helper function which generates the correct Applicator
@@ -25,9 +26,9 @@ sortColors{true, true, true},
 moveColors{true, true, true},
 colorMatcher{0, 1, 0, 1, 0, 1},
 theta{0.0},
-rect{0, 0, 100, 100},
-Xrepeat{0, 100, 1000},
-Yrepeat{0, 100, 1000}
+rect{0, 0, 200, 200},
+Xrepeat{0, 400, 1000},
+Yrepeat{0, 400, 1000}
 {};
 
 void PixelSortOptions::setImage(Magick::Image* img)
@@ -79,6 +80,8 @@ void PixelSortOptions::doSort()
 
             quad.bounds.x = coordX;
             quad.bounds.y = coordY;
+            
+            std::cout << "Block: " << coordX << ", " << coordY << std::endl;
 
             /* Build a PixelVector from the image's pixels */
             PS::PixelVector pv(
