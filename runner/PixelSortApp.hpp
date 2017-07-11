@@ -6,6 +6,8 @@
 #include <QStatusBar>
 #include <QMenu>
 #include <QFormLayout>
+#include <QCheckBox>
+#include <QLabel>
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -46,8 +48,23 @@ private:
     QFileDialog fileexport;
     
     QFormLayout formlayout;
+
+    /* Sort options buttons */
+    QWidget sortContainer;
+    QVBoxLayout sortBox;
+    QLabel sortLabel;
+    QCheckBox rSort;
+    QCheckBox gSort;
+    QCheckBox bSort;
+
+    QWidget moveContainer;
+    QVBoxLayout moveBox;
+    QLabel moveLabel;
+    QCheckBox rMove;
+    QCheckBox gMove;
+    QCheckBox bMove;
+
     QPushButton sortbutton;
-      
     QPushButton quitbutton;
         
     QMenu fileMenu; 

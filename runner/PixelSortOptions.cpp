@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <cmath>
 #include "PixelSortOptions.hpp"
 
 /* Helper function which generates the correct Applicator
@@ -19,7 +20,6 @@ PS::Pixel sendColor(const PS::Pixel& p1, const PS::Pixel& p2) {
     }
     return p;
 }
-template PS::Pixel sendColor<true, true, true>(const PS::Pixel&, const PS::Pixel&);
 
 PixelSortOptions::PixelSortOptions():
 sortColors{true, true, true},
@@ -49,8 +49,36 @@ void PixelSortOptions::doSort()
     PS::WeightedComparator comp(rComp, gComp, bComp);
 
     /* Create applicator */
-    // PS::ApplyFcn applyFcn = sendColor<moveColors[0], moveColors[1], moveColors[2]>;
     PS::ApplyFcn applyFcn = sendColor<true, true, true>;
+    if (moveColors[0]) {
+        if (moveColors[1]) {
+            if (moveColors[2]) {
+                // do nothing
+            } else {
+                applyFcn = sendColor<true, true, false>;
+            }
+        } else {
+            if (moveColors[2]) {
+                applyFcn = sendColor<true, false, true>;
+            } else {
+                applyFcn = sendColor<true, false, false>;
+            }
+        }
+    } else {
+        if (moveColors[1]) {
+            if (moveColors[2]) {
+                applyFcn = sendColor<false, true, true>;
+            } else {
+                applyFcn = sendColor<false, true, false>;
+            }
+        } else {
+            if (moveColors[2]) {
+                applyFcn = sendColor<false, false, true>;
+            } else {
+                applyFcn = sendColor<false, false, false>;
+            }
+        }
+    }
 
     /* Create color matcher */
     Magick::ColorRGB cMin(colorMatcher[0], colorMatcher[2], colorMatcher[4]);
@@ -74,28 +102,31 @@ void PixelSortOptions::doSort()
     img->modifyImage();
     img->type(Magick::TrueColorType);
 
+    int numBlocks = std::ceil((Xend - Xstart) / Xpitch) * std::ceil((Yend - Ystart) / Ypitch);
+    int blocksCompleted = 0;
     /* Select a minimal region within the image */
     for (double coordX = Xstart; coordX < Xend; coordX += Xpitch) {
         for (double coordY = Ystart; coordY < Yend; coordY += Ypitch) {
 
             quad.bounds.x = coordX;
             quad.bounds.y = coordY;
-          
-            std::string str("PixelSorting block: " + std::to_string(coordX) + ", " + std::to_string(coordY));
+
+            /* Update string */
+            std::string str("PixelSorting, ");
+            str += std::to_string(int(100 * double(blocksCompleted) / double(numBlocks)));
+            str += "% done";
             notifyMe->notify(str.c_str());
 
             /* Build a PixelVector from the image's pixels */
-            PS::PixelVector pv(
-                *img, PS::BoxCoordinate(
-                    0, 0, img->columns(), img->rows()
-                ), quad
-            ); 
-        
+            PS::PixelVector pv(*img, quad.bounds); 
+            
             /* Rotate pixelvector */
             pv.sort(PS::AngleComparator(theta));
 
             /* Sort and Apply */
             PS::AsendorfSort<PS::Matcher, PS::Comparator>(pv, mat, comp, applyFcn); 
+            
+            ++blocksCompleted;
         }
     }
 }

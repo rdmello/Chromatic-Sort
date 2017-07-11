@@ -19,12 +19,25 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     exportbutton("Export", &dockwidget_mid),
     fileexport(this),
     formlayout(),
+    sortContainer(&dockwidget_mid),
+    sortBox(),
+    sortLabel("Sort Options", &sortContainer),
+    rSort("Red", &sortContainer),
+    gSort("Green", &sortContainer),
+    bSort("Blue", &sortContainer),
+    moveContainer(&dockwidget_mid),
+    moveBox(),
+    moveLabel("Move Options", &moveContainer),
+    rMove("Red", &moveContainer),
+    gMove("Green", &moveContainer),
+    bMove("Blue", &moveContainer),
     sortbutton("PixelSort", &dockwidget_mid),
     quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
 {
     this->resize(800, 500);
     this->setWindowTitle("PixelSort app v2");
+    this->setUnifiedTitleAndToolBarOnMac(true);
 
     imageFilePath = "/Users/Rylan/Desktop/Projects/Glitch/sorting/cxx_proj/images/expo_out.tiff";
     QPixmap pixmap(imageFilePath);
@@ -33,8 +46,8 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     this->setCentralWidget(&view);
         
     // set up dockwidget
-    this->addDockWidget(Qt::RightDockWidgetArea, &dockwidget);
-    dockwidget.setAllowedAreas(Qt::RightDockWidgetArea);
+    this->addDockWidget(Qt::LeftDockWidgetArea, &dockwidget);
+    dockwidget.setAllowedAreas(Qt::LeftDockWidgetArea);
     dockwidget.setFeatures(QDockWidget::NoDockWidgetFeatures);
     dockwidget.setWidget(&dockwidget_mid);
         
@@ -62,9 +75,32 @@ PixelSortApp::PixelSortApp(QApplication* parent):
  
     // Set up the form layout widget 
     vbox.addLayout(&formlayout);
+    formlayout.setLabelAlignment(Qt::AlignCenter);
     
+    // add sort options buttons to formlayout
+    sortContainer.setLayout(&sortBox);
+    sortBox.addWidget(&sortLabel);
+    sortBox.addWidget(&rSort);
+    sortBox.addWidget(&gSort);
+    sortBox.addWidget(&bSort);
+    rSort.setChecked(true);
+    gSort.setChecked(true);
+    bSort.setChecked(true);
+    
+    moveContainer.setLayout(&moveBox);
+    moveBox.addWidget(&moveLabel);
+    moveBox.addWidget(&rMove);
+    moveBox.addWidget(&gMove);
+    moveBox.addWidget(&bMove);
+    rMove.setChecked(true);
+    gMove.setChecked(true);
+    bMove.setChecked(true);
+
+    formlayout.addRow(&sortContainer);
+    formlayout.addRow(&moveContainer);
+
     // add sort button to formlayout
-    formlayout.addRow("Do sort", &sortbutton);
+    formlayout.addRow(&sortbutton);
     QObject::connect(&sortbutton, SIGNAL(clicked()), this, SLOT(sortButtonAction()));
  
     // add quit button to vbox
@@ -79,6 +115,17 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     menuBar()->show();
     // menuBar()->setNativeMenuBar(false);
 
+    // Read initial image file
+    try {
+        img.read(imageFilePath.toStdString());
+        opts.setImage(&img);
+    } 
+    catch(Magick::WarningCoder& warning) 
+    {
+        statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
+    } 
+    statusBar()->showMessage("New image successfully loaded: " + QString(imageFilePath));
+
     // Set up statusbar (at bottom of window)
     opts.notifyMe = this;
     statusBar()->showMessage("Ready");
@@ -92,8 +139,14 @@ void PixelSortApp::reloadImage(QString fileStr)
     updateScene(newImg);
   
     // Read image using imagemagick
-    img.read(fileStr.toStdString());
-    opts.setImage(&img);
+    try {
+        img.read(fileStr.toStdString());
+        opts.setImage(&img);
+    } 
+    catch(Magick::WarningCoder& warning) 
+    {
+        statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
+    } 
     statusBar()->showMessage("New image successfully loaded: " + fileStr);
 }
 
@@ -116,12 +169,22 @@ void PixelSortApp::writeImage(QString fileStr)
 
 void PixelSortApp::sortButtonAction() 
 {
+    /* Pick up current options */
+    opts.sortColors[0] = rSort.isChecked();
+    opts.sortColors[1] = gSort.isChecked();
+    opts.sortColors[2] = bSort.isChecked();
+    opts.moveColors[0] = rMove.isChecked();
+    opts.moveColors[1] = gMove.isChecked();
+    opts.moveColors[2] = bMove.isChecked();
+
     /* Sort and Apply */
     statusBar()->showMessage("Sorting image...");
     opts.doSort();
 
     /* Updating Qt::QPixmap */
     statusBar()->showMessage("Writing into QPixmap");
+    appPtr->processEvents();
+
     QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
     QColor value;
     Magick::ColorRGB mcol;
@@ -135,6 +198,14 @@ void PixelSortApp::sortButtonAction()
             );
             qimg.setPixel(j, i, value.rgb());
         }
+        
+        /* Updating Qt::QPixmap */
+        int compPerc = 100.0 * double(i) / double(img.rows());
+        std::string printMsg("Writing into QPixmap: ");
+        printMsg += std::to_string(compPerc);
+        printMsg += "% done";
+        statusBar()->showMessage(printMsg.c_str());
+        appPtr->processEvents();
     }
     
     QPixmap newImg = QPixmap::fromImage(qimg);
@@ -146,4 +217,5 @@ void PixelSortApp::sortButtonAction()
 void PixelSortApp::notify(const char* str)
 {
     statusBar()->showMessage(str);
+    appPtr->processEvents();
 }

@@ -93,6 +93,10 @@ int main (int argc, char* argv[]) {
 
     Magick::InitializeMagick("");
 
+    /*
+     * Branch into GUI app if no input arguments are given
+     * never returns
+     */
     if (argc <= 1) {
         QApplication app(argc, argv);
         PixelSortApp psapp(&app);
