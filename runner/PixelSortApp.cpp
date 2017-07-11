@@ -21,16 +21,16 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     formlayout(),
     sortContainer(&dockwidget_mid),
     sortBox(),
-    sortLabel("Sort Options", &sortContainer),
-    rSort("Red", &sortContainer),
-    gSort("Green", &sortContainer),
-    bSort("Blue", &sortContainer),
+    sortLabel(" Sort", &sortContainer),
+    rSort("", &sortContainer),
+    gSort("", &sortContainer),
+    bSort("", &sortContainer),
     moveContainer(&dockwidget_mid),
     moveBox(),
-    moveLabel("Move Options", &moveContainer),
-    rMove("Red", &moveContainer),
-    gMove("Green", &moveContainer),
-    bMove("Blue", &moveContainer),
+    moveLabel("Move", &moveContainer),
+    rMove("", &moveContainer),
+    gMove("", &moveContainer),
+    bMove("", &moveContainer),
     sortbutton("PixelSort", &dockwidget_mid),
     quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
@@ -79,23 +79,31 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     
     // add sort options buttons to formlayout
     sortContainer.setLayout(&sortBox);
+    sortBox.setContentsMargins(0, 0, 0, 0);
     sortBox.addWidget(&sortLabel);
     sortBox.addWidget(&rSort);
     sortBox.addWidget(&gSort);
     sortBox.addWidget(&bSort);
     rSort.setChecked(true);
+    rSort.setStyleSheet("background-color: red");
     gSort.setChecked(true);
+    gSort.setStyleSheet("background-color: green");
     bSort.setChecked(true);
+    bSort.setStyleSheet("background-color: blue");
     
     moveContainer.setLayout(&moveBox);
+    moveBox.setContentsMargins(0, 0, 0, 0);
     moveBox.addWidget(&moveLabel);
     moveBox.addWidget(&rMove);
     moveBox.addWidget(&gMove);
     moveBox.addWidget(&bMove);
     rMove.setChecked(true);
+    rMove.setStyleSheet("background-color: red");
     gMove.setChecked(true);
+    gMove.setStyleSheet("background-color: green");
     bMove.setChecked(true);
-
+    bMove.setStyleSheet("background-color: blue");
+   
     formlayout.addRow(&sortContainer);
     formlayout.addRow(&moveContainer);
 

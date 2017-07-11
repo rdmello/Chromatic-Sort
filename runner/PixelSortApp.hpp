@@ -51,14 +51,14 @@ private:
 
     /* Sort options buttons */
     QWidget sortContainer;
-    QVBoxLayout sortBox;
+    QHBoxLayout sortBox;
     QLabel sortLabel;
     QCheckBox rSort;
     QCheckBox gSort;
     QCheckBox bSort;
 
     QWidget moveContainer;
-    QVBoxLayout moveBox;
+    QHBoxLayout moveBox;
     QLabel moveLabel;
     QCheckBox rMove;
     QCheckBox gMove;
