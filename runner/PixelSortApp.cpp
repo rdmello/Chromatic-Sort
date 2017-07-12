@@ -31,15 +31,29 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     rMove("", &moveContainer),
     gMove("", &moveContainer),
     bMove("", &moveContainer),
+    minLabel("Min Threshold", &dockwidget_mid),
+    rMin(Qt::Horizontal, &dockwidget_mid),
+    gMin(Qt::Horizontal, &dockwidget_mid),
+    bMin(Qt::Horizontal, &dockwidget_mid),
+    maxLabel("Max Threshold", &dockwidget_mid),
+    rMax(Qt::Horizontal, &dockwidget_mid),
+    gMax(Qt::Horizontal, &dockwidget_mid),
+    bMax(Qt::Horizontal, &dockwidget_mid),
+    angleLabel("Angle"),
+    angleDial(&dockwidget_mid),
+    boxW(&dockwidget_mid),
+    boxH(&dockwidget_mid),
+    distX(&dockwidget_mid),
+    distY(&dockwidget_mid),
     sortbutton("PixelSort", &dockwidget_mid),
-    quitbutton("Quit", &dockwidget_mid),
+ //   quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
 {
     this->resize(800, 500);
     this->setWindowTitle("PixelSort app v2");
     this->setUnifiedTitleAndToolBarOnMac(true);
 
-    imageFilePath = "/Users/Rylan/Desktop/Projects/Glitch/sorting/cxx_proj/images/expo_out.tiff";
+    imageFilePath = "../images/expo.tiff";
     QPixmap pixmap(imageFilePath);
     mainImg = scene.addPixmap(pixmap);
 
@@ -80,40 +94,104 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // add sort options buttons to formlayout
     sortContainer.setLayout(&sortBox);
     sortBox.setContentsMargins(0, 0, 0, 0);
-    sortBox.addWidget(&sortLabel);
+    // sortBox.addWidget(&sortLabel);
     sortBox.addWidget(&rSort);
     sortBox.addWidget(&gSort);
     sortBox.addWidget(&bSort);
     rSort.setChecked(true);
-    rSort.setStyleSheet("background-color: red");
     gSort.setChecked(true);
-    gSort.setStyleSheet("background-color: green");
     bSort.setChecked(true);
+    rSort.setStyleSheet("background-color: red");
+    gSort.setStyleSheet("background-color: green");
     bSort.setStyleSheet("background-color: blue");
     
     moveContainer.setLayout(&moveBox);
     moveBox.setContentsMargins(0, 0, 0, 0);
-    moveBox.addWidget(&moveLabel);
+    // moveBox.addWidget(&moveLabel);
     moveBox.addWidget(&rMove);
     moveBox.addWidget(&gMove);
     moveBox.addWidget(&bMove);
     rMove.setChecked(true);
-    rMove.setStyleSheet("background-color: red");
     gMove.setChecked(true);
-    gMove.setStyleSheet("background-color: green");
     bMove.setChecked(true);
+    rMove.setStyleSheet("background-color: red");
+    gMove.setStyleSheet("background-color: green");
     bMove.setStyleSheet("background-color: blue");
+
+    rMin.setStyleSheet("background-color: red");
+    rMax.setStyleSheet("background-color: red");
+    gMin.setStyleSheet("background-color: green");
+    gMax.setStyleSheet("background-color: green");
+    bMin.setStyleSheet("background-color: blue");
+    bMax.setStyleSheet("background-color: blue");
+    rMin.setMinimum(0);
+    rMin.setMaximum(100);
+    gMin.setMinimum(0);
+    gMin.setMaximum(100);
+    bMin.setMinimum(0);
+    bMin.setMaximum(100);
+    rMax.setMinimum(0);
+    rMax.setMaximum(100);
+    gMax.setMinimum(0);
+    gMax.setMaximum(100);
+    bMax.setMinimum(0);
+    bMax.setMaximum(100);
+    rMax.setValue(100);
+    gMax.setValue(100);
+    bMax.setValue(100);
    
-    formlayout.addRow(&sortContainer);
-    formlayout.addRow(&moveContainer);
+    formlayout.addRow("Sort", &sortContainer);
+    formlayout.addRow("Move", &moveContainer);
+    formlayout.addRow(&minLabel);
+    formlayout.addRow(&rMin);
+    formlayout.addRow(&gMin);
+    formlayout.addRow(&bMin);
+    formlayout.addRow(&maxLabel);
+    formlayout.addRow(&rMax);
+    formlayout.addRow(&gMax);
+    formlayout.addRow(&bMax);
+
+    /* Set angle control property */
+    angleDial.setWrapping(true);
+    angleDial.setMinimum(-2);
+    angleDial.setMaximum(6);
+    angleDial.setValue(0);
+    formlayout.addRow(&angleLabel);
+    formlayout.addRow(&angleDial);
+
+    /* Set box width and height properties */
+    boxW.setMinimum(1);
+    boxW.setMaximum(10000);
+    boxW.setSingleStep(100);
+    boxW.setValue(200);
+    boxH.setMinimum(1);
+    boxH.setMaximum(10000);
+    boxH.setSingleStep(100);
+    boxH.setValue(200);
+    formlayout.addRow("Width", &boxW);
+    formlayout.addRow("Height", &boxH);
+
+    /* Set repeat width and height properties */
+    distX.setMinimum(200);
+    distX.setMaximum(10000);
+    distX.setSingleStep(100);
+    distX.setValue(200);
+    distY.setMinimum(200);
+    distY.setMaximum(10000);
+    distY.setSingleStep(100);
+    distY.setValue(200);
+    formlayout.addRow("RepeatX", &distX);
+    formlayout.addRow("RepeatY", &distY);
+    QObject::connect(&boxW, SIGNAL(valueChanged(int)), this, SLOT(distXset(int)));
+    QObject::connect(&boxH, SIGNAL(valueChanged(int)), this, SLOT(distYset(int)));
 
     // add sort button to formlayout
     formlayout.addRow(&sortbutton);
     QObject::connect(&sortbutton, SIGNAL(clicked()), this, SLOT(sortButtonAction()));
  
     // add quit button to vbox
-    vbox.addWidget(&quitbutton);
-    QObject::connect(&quitbutton, SIGNAL(clicked()), appPtr, SLOT(quit()));
+    // vbox.addWidget(&quitbutton);
+    // QObject::connect(&quitbutton, SIGNAL(clicked()), appPtr, SLOT(quit()));
 
     // Set up menubar
     fileMenu.addAction("Item 1");
@@ -126,12 +204,12 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // Read initial image file
     try {
         img.read(imageFilePath.toStdString());
-        opts.setImage(&img);
     } 
     catch(Magick::WarningCoder& warning) 
     {
         statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
     } 
+    opts.setImage(&img);
     statusBar()->showMessage("New image successfully loaded: " + QString(imageFilePath));
 
     // Set up statusbar (at bottom of window)
@@ -149,12 +227,12 @@ void PixelSortApp::reloadImage(QString fileStr)
     // Read image using imagemagick
     try {
         img.read(fileStr.toStdString());
-        opts.setImage(&img);
     } 
     catch(Magick::WarningCoder& warning) 
     {
         statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
     } 
+    opts.setImage(&img);
     statusBar()->showMessage("New image successfully loaded: " + fileStr);
 }
 
@@ -184,6 +262,17 @@ void PixelSortApp::sortButtonAction()
     opts.moveColors[0] = rMove.isChecked();
     opts.moveColors[1] = gMove.isChecked();
     opts.moveColors[2] = bMove.isChecked();
+    opts.colorMatcher[0] = double(rMin.value()) / 100.0;
+    opts.colorMatcher[1] = double(rMax.value()) / 100.0;
+    opts.colorMatcher[2] = double(gMin.value()) / 100.0;
+    opts.colorMatcher[3] = double(gMax.value()) / 100.0;
+    opts.colorMatcher[4] = double(bMin.value()) / 100.0;
+    opts.colorMatcher[5] = double(bMax.value()) / 100.0;
+    opts.theta = 45.0*double(angleDial.value());
+    opts.rect[2] = boxW.value();
+    opts.rect[3] = boxH.value();
+    opts.Xrepeat[1] = distX.value();
+    opts.Yrepeat[1] = distY.value();
 
     /* Sort and Apply */
     statusBar()->showMessage("Sorting image...");
@@ -226,4 +315,20 @@ void PixelSortApp::notify(const char* str)
 {
     statusBar()->showMessage(str);
     appPtr->processEvents();
+}
+
+void PixelSortApp::distXset(int newval)
+{
+    if (distX.value() < newval) {
+        distX.setValue(newval);
+    }
+    distX.setMinimum(newval);
+}
+
+void PixelSortApp::distYset(int newval)
+{
+    if (distY.value() < newval) {
+        distY.setValue(newval);
+    }
+    distY.setMinimum(newval);
 }

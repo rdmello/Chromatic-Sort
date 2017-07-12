@@ -23,8 +23,8 @@ struct PixelSortOptions
     double theta;
     double rect[4];
 
-    double Xrepeat[3];
-    double Yrepeat[3];
+    int Xrepeat[3];
+    int Yrepeat[3];
 
     // Call this function with status updates
     Notifiable* notifyMe;

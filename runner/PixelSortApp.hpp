@@ -8,6 +8,9 @@
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QLabel>
+#include <QSlider>
+#include <QDial>
+#include <QSpinBox>
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -57,6 +60,7 @@ private:
     QCheckBox gSort;
     QCheckBox bSort;
 
+    /* Move options buttons */
     QWidget moveContainer;
     QHBoxLayout moveBox;
     QLabel moveLabel;
@@ -64,8 +68,30 @@ private:
     QCheckBox gMove;
     QCheckBox bMove;
 
+    /* Matcher options sliders */
+    QLabel minLabel;
+    QSlider rMin;
+    QSlider gMin;
+    QSlider bMin;
+    QLabel maxLabel;
+    QSlider rMax;
+    QSlider gMax;
+    QSlider bMax;
+
+    /* Angle controls */
+    QLabel angleLabel;
+    QDial angleDial;
+
+    /* Box Size */
+    QSpinBox boxW;
+    QSpinBox boxH;
+
+    /* Repeat distance */
+    QSpinBox distX;
+    QSpinBox distY;
+
     QPushButton sortbutton;
-    QPushButton quitbutton;
+    // QPushButton quitbutton;
         
     QMenu fileMenu; 
     
@@ -78,6 +104,8 @@ public slots:
     void writeImage(QString);
     void updateScene(QPixmap&);
     void sortButtonAction();
+    void distXset(int);
+    void distYset(int);
 };
 
 

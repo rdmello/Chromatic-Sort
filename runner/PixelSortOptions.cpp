@@ -27,15 +27,15 @@ moveColors{true, true, true},
 colorMatcher{0, 1, 0, 1, 0, 1},
 theta{0.0},
 rect{0, 0, 200, 200},
-Xrepeat{0, 400, 1000},
-Yrepeat{0, 400, 1000}
+Xrepeat{0, 200, 1000},
+Yrepeat{0, 200, 1000}
 {};
 
 void PixelSortOptions::setImage(Magick::Image* img)
 {
     this->img = img;
-    Xrepeat[2] = double(img->columns());
-    Yrepeat[2] = double(img->rows());
+    Xrepeat[2] = int(img->columns());
+    Yrepeat[2] = int(img->rows());
 }
 
 PixelSortOptions::~PixelSortOptions() {};
@@ -93,8 +93,12 @@ void PixelSortOptions::doSort()
     );
 
     /* Create Xrepeat, Yrepeat parameters */
-    double Xstart = Xrepeat[0], Xpitch = Xrepeat[1], Xend = Xrepeat[2];
-    double Ystart = Yrepeat[0], Ypitch = Yrepeat[1], Yend = Yrepeat[2];
+    int Xstart = Xrepeat[0];
+    int Xpitch = Xrepeat[1];
+    int Xend   = Xrepeat[2];
+    int Ystart = Yrepeat[0];
+    int Ypitch = Yrepeat[1];
+    int Yend   = Yrepeat[2];
 
     /* 
      * Start PixelSorting 
