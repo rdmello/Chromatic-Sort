@@ -21,13 +21,11 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     formlayout(),
     sortContainer(&dockwidget_mid),
     sortBox(),
-    sortLabel(" Sort", &sortContainer),
     rSort("", &sortContainer),
     gSort("", &sortContainer),
     bSort("", &sortContainer),
     moveContainer(&dockwidget_mid),
     moveBox(),
-    moveLabel("Move", &moveContainer),
     rMove("", &moveContainer),
     gMove("", &moveContainer),
     bMove("", &moveContainer),
@@ -46,14 +44,13 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     distX(&dockwidget_mid),
     distY(&dockwidget_mid),
     sortbutton("PixelSort", &dockwidget_mid),
- //   quitbutton("Quit", &dockwidget_mid),
     fileMenu("File")
 {
     this->resize(800, 500);
     this->setWindowTitle("PixelSort app v2");
     this->setUnifiedTitleAndToolBarOnMac(true);
 
-    imageFilePath = "../images/expo.tiff";
+    imageFilePath = "../images/lake.png";
     QPixmap pixmap(imageFilePath);
     mainImg = scene.addPixmap(pixmap);
 
@@ -72,7 +69,7 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // file import dialog settings
     fileimport.setFileMode(QFileDialog::ExistingFile);
     fileimport.setAcceptMode(QFileDialog::AcceptOpen);
-    fileimport.setNameFilter("Images (*.png *.tiff)");
+    fileimport.setNameFilter("Images (*.png *.tiff *.tif)");
     fileimport.fileSelected(imageFilePath);
 
     // file export dialog settings
@@ -94,29 +91,27 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // add sort options buttons to formlayout
     sortContainer.setLayout(&sortBox);
     sortBox.setContentsMargins(0, 0, 0, 0);
-    // sortBox.addWidget(&sortLabel);
     sortBox.addWidget(&rSort);
     sortBox.addWidget(&gSort);
     sortBox.addWidget(&bSort);
     rSort.setChecked(true);
     gSort.setChecked(true);
     bSort.setChecked(true);
-    rSort.setStyleSheet("background-color: red");
-    gSort.setStyleSheet("background-color: green");
-    bSort.setStyleSheet("background-color: blue");
+    rSort.setStyleSheet("background-color: red;");
+    gSort.setStyleSheet("background-color: green;");
+    bSort.setStyleSheet("background-color: blue;");
     
     moveContainer.setLayout(&moveBox);
     moveBox.setContentsMargins(0, 0, 0, 0);
-    // moveBox.addWidget(&moveLabel);
     moveBox.addWidget(&rMove);
     moveBox.addWidget(&gMove);
     moveBox.addWidget(&bMove);
     rMove.setChecked(true);
     gMove.setChecked(true);
     bMove.setChecked(true);
-    rMove.setStyleSheet("background-color: red");
-    gMove.setStyleSheet("background-color: green");
-    bMove.setStyleSheet("background-color: blue");
+    rMove.setStyleSheet("background-color: red;");
+    gMove.setStyleSheet("background-color: green;");
+    bMove.setStyleSheet("background-color: blue;");
 
     rMin.setStyleSheet("background-color: red");
     rMax.setStyleSheet("background-color: red");
