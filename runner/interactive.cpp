@@ -45,6 +45,7 @@ namespace po = boost::program_options;
 
 #include "PixelSortApp.hpp"
 #include "PixelSortOptions.hpp"
+#include "driver/MagickDriver.hpp"
 
 /* Logging function
  * Verbosity:
@@ -201,6 +202,7 @@ int main (int argc, char* argv[]) {
     std::string infile, outfile;
     Magick::Image img;
     PixelSortOptions opts;
+    opts.notifyMe = &logger;
 
     /* 
      * Print input file name if one is found 
@@ -246,10 +248,10 @@ int main (int argc, char* argv[]) {
         logger.log(-1, std::string("Error while reading image file") + error.what());
     }
 
-    /* Set PixelSortOptions Image */
-    opts.setImage(&img);
-    opts.notifyMe = &logger;
-
+    /* Set image options after reading */
+    PS::MagickDriver drv(img, PS::BoxCoordinate(0, 0, img.columns(), img.rows()));
+    opts.setImage(&drv);
+    
     /* 
      * Read and set sort comparator
      */

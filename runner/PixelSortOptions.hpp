@@ -1,6 +1,4 @@
 
-#include <Magick++.h>
-
 #include "PixelSort.hpp"
 namespace PS = PixelSort;
 
@@ -14,7 +12,7 @@ struct Notifiable
 
 struct PixelSortOptions 
 {
-    Magick::Image* img;
+    PS::Image* img;
 
     bool sortColors[3];
     bool moveColors[3];
@@ -32,7 +30,7 @@ struct PixelSortOptions
     PixelSortOptions();
     ~PixelSortOptions();
     
-    void setImage(Magick::Image* img);
+    void setImage(PS::Image* img);
     void doSort();
 };
 

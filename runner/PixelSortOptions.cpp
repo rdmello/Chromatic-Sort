@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cmath>
 #include "PixelSortOptions.hpp"
-#include "driver/MagickDriver.hpp"
 
 /* Helper function which generates the correct Applicator
  * for pixelsorting 
@@ -32,7 +31,7 @@ Xrepeat{0, 200, 1000},
 Yrepeat{0, 200, 1000}
 {};
 
-void PixelSortOptions::setImage(Magick::Image* img)
+void PixelSortOptions::setImage(PS::Image* img)
 {
     this->img  = img;
     Xrepeat[2] = int(img->columns());
@@ -107,6 +106,7 @@ void PixelSortOptions::doSort()
 
     int numBlocks = std::ceil((Xend - Xstart) / Xpitch) * std::ceil((Yend - Ystart) / Ypitch);
     int blocksCompleted = 0;
+
     /* Select a minimal region within the image */
     for (double coordX = Xstart; coordX < Xend; coordX += Xpitch) {
         for (double coordY = Ystart; coordY < Yend; coordY += Ypitch) {
@@ -121,8 +121,7 @@ void PixelSortOptions::doSort()
             notifyMe->notify(str.c_str());
 
             /* Build a PixelVector from the image's pixels */
-            PS::MagickDriver drv(*img, quad.bounds);
-            PS::PixelVector pv(drv, quad.bounds); 
+            PS::PixelVector pv(*img, quad.bounds); 
             
             /* Rotate pixelvector */
             pv.sort(PS::AngleComparator(theta));

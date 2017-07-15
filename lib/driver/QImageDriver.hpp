@@ -13,11 +13,11 @@ namespace PixelSort {
         /* Reference to image object */
         QImage& image;
 
-        /* Pointer to ROI being sorted */
-        BoundedCoordinate box;
+        /* Reference to coordinate change point */
+        BoxCoordinate box;
 
     public:
-        QImageDriver(QImage& image, const BoxCoordinate& box);
+        QImageDriver(QImage& image);
         virtual unsigned int columns (void) const;
         virtual unsigned int rows    (void) const;
 

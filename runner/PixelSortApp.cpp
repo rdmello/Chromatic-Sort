@@ -44,15 +44,13 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     distX(&dockwidget_mid),
     distY(&dockwidget_mid),
     sortbutton("PixelSort", &dockwidget_mid),
-    fileMenu("File")
+    fileMenu("File"),
+    img(),
+    drv(img)
 {
     this->resize(800, 500);
     this->setWindowTitle("PixelSort app v2");
     this->setUnifiedTitleAndToolBarOnMac(true);
-
-    imageFilePath = "../resources/lake.png";
-    QPixmap pixmap(imageFilePath);
-    mainImg = scene.addPixmap(pixmap);
 
     this->setCentralWidget(&view);
         
@@ -197,15 +195,13 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // menuBar()->setNativeMenuBar(false);
 
     // Read initial image file
-    try {
-        img.read(imageFilePath.toStdString());
-    } 
-    catch(Magick::WarningCoder& warning) 
-    {
-        statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
-    }
-    opts.setImage(&img);
-    statusBar()->showMessage("New image successfully loaded: " + QString(imageFilePath));
+    imageFilePath = "../resources/lake.png";
+    img.load(imageFilePath);
+    QPixmap newImg = QPixmap::fromImage(img);
+    mainImg = scene.addPixmap(newImg);
+    opts.setImage(&drv);
+
+    statusBar()->showMessage("New image successfully loaded: " + imageFilePath);
 
     // Set up statusbar (at bottom of window)
     opts.notifyMe = this;
@@ -215,19 +211,13 @@ PixelSortApp::PixelSortApp(QApplication* parent):
 void PixelSortApp::reloadImage(QString fileStr) 
 {
     statusBar()->showMessage("Reading image");
-    QPixmap newImg(fileStr);
+ 
+    // Read image using QImage
+    img.load(fileStr);
+    QPixmap newImg = QPixmap::fromImage(img);
     mainImg->setPixmap(newImg);
     updateScene(newImg);
-  
-    // Read image using imagemagick
-    try {
-        img.read(fileStr.toStdString());
-    } 
-    catch(Magick::WarningCoder& warning) 
-    {
-        statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
-    } 
-    opts.setImage(&img);
+ 
     statusBar()->showMessage("New image successfully loaded: " + fileStr);
 }
 
@@ -241,11 +231,8 @@ void PixelSortApp::updateScene(QPixmap& newImg) {
 void PixelSortApp::writeImage(QString fileStr) 
 {
     statusBar()->showMessage("Writing image");
-    img.write(fileStr.toStdString());
+    img.save(fileStr);
     statusBar()->showMessage("Successfully written image: " + fileStr);
-    // QPixmap newImg(fileStr);
-    // mainImg->setPixmap(newImg);
-    // updateScene(newImg);
 }
 
 void PixelSortApp::sortButtonAction() 
@@ -277,30 +264,7 @@ void PixelSortApp::sortButtonAction()
     statusBar()->showMessage("Writing into QPixmap");
     appPtr->processEvents();
 
-    QImage qimg(img.columns(), img.rows(), QImage::Format_RGB32);
-    QColor value;
-    Magick::ColorRGB mcol;
-    for (unsigned int i = 0; i < img.rows(); ++i) {
-        for (unsigned int j = 0; j < img.columns(); ++j) {
-            mcol = Magick::ColorRGB(img.pixelColor(j, i));
-            value = QColor(
-                std::floor(255*mcol.red()), 
-                std::floor(255*mcol.green()), 
-                std::floor(255*mcol.blue())
-            );
-            qimg.setPixel(j, i, value.rgb());
-        }
-        
-        /* Updating Qt::QPixmap */
-        int compPerc = 100.0 * double(i) / double(img.rows());
-        std::string printMsg("Writing into QPixmap: ");
-        printMsg += std::to_string(compPerc);
-        printMsg += "% done";
-        statusBar()->showMessage(printMsg.c_str());
-        appPtr->processEvents();
-    }
-    
-    QPixmap newImg = QPixmap::fromImage(qimg);
+    QPixmap newImg = QPixmap::fromImage(img);
     mainImg->setPixmap(newImg);
     updateScene(newImg);
     statusBar()->showMessage("Ready");
@@ -310,6 +274,10 @@ void PixelSortApp::notify(const char* str)
 {
     statusBar()->showMessage(str);
     appPtr->processEvents();
+    QPixmap newImg = QPixmap::fromImage(img);
+    mainImg->setPixmap(newImg);
+    updateScene(newImg);
+
 }
 
 void PixelSortApp::distXset(int newval)

@@ -21,12 +21,9 @@
 #include <QFileDialog>
 #include <QPushButton>
 
-// Magick++ includes
-#include <Magick++.h>
-
 // PixelSort includes
 #include "PixelSortOptions.hpp"
-#include "driver/MagickDriver.hpp"
+#include "driver/QImageDriver.hpp"
 
 class PixelSortApp : public QMainWindow, public Notifiable
 {
@@ -97,7 +94,8 @@ private:
     QMenu fileMenu; 
     
     // Image and PixelSort resources
-    Magick::Image img;
+    QImage img;
+    PS::QImageDriver drv;
     PixelSortOptions opts;
 
 public slots:

@@ -4,8 +4,8 @@
 /*
  * set the reference to the QImage
  */
-PixelSort::QImageDriver::QImageDriver(QImage& image, const BoxCoordinate& box):
-image{image}, box{box, image.width(), image.height()} 
+PixelSort::QImageDriver::QImageDriver(QImage& image):
+image{image}, box{0, 0, image.width(), image.height()}
 {
     /* do nothing */
 }
@@ -13,14 +13,14 @@ image{image}, box{box, image.width(), image.height()}
 void 
 PixelSort::QImageDriver::readPrep (const BoxCoordinate& box)
 {
-    /* do nothing */
+    this->box = box;
 }
 
 
 void 
 PixelSort::QImageDriver::readRGBFromXY (Pixel& p) const
 {
-    QColor rgbColor = image.pixelColor(p.x, p.y);
+    QColor rgbColor = image.pixelColor(box.x + p.x, box.y + p.y);
 
     p.red(rgbColor.redF());
     p.green(rgbColor.greenF());
@@ -44,7 +44,7 @@ void
 PixelSort::QImageDriver::writeRGBFromXY (const Pixel& p)
 {
     QColor color = QColor::fromRgbF(p.red(), p.green(), p.blue());
-    image.setPixelColor(p.x, p.y, color);
+    image.setPixelColor(box.x + p.x, box.y + p.y, color);
 }
 
 void 
