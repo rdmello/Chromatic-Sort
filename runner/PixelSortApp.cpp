@@ -50,7 +50,7 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     this->setWindowTitle("PixelSort app v2");
     this->setUnifiedTitleAndToolBarOnMac(true);
 
-    imageFilePath = "../images/lake.png";
+    imageFilePath = "../resources/lake.png";
     QPixmap pixmap(imageFilePath);
     mainImg = scene.addPixmap(pixmap);
 
