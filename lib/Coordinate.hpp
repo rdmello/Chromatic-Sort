@@ -1,8 +1,6 @@
 
 #include <vector>
 
-#include <Magick++.h>
-
 /*
  * Coordinate.hpp
  * The Coordinate class and its subclasses provide
@@ -17,14 +15,30 @@ namespace PixelSort {
 
     /* Store x, y coordinates in convenient way */
     struct Coordinate {
-        int x, y;
-        Coordinate(int x, int y);
+        unsigned int x, y;
+        Coordinate(unsigned int x, unsigned int y);
     };
 
-    /* Store x, y coordinates with Magick::Color in a convenient way */
-    struct ColorCoordinate : public Coordinate, public Magick::ColorRGB {
+    /* Store RGB colors between 0 to 1 */
+    struct RGBColor {
+        double r, g, b;
+
+        RGBColor(double r, double g, double b);
+        
+        double red(void) const;
+        void red(double);
+        
+        double green(void) const;
+        void green(double);
+        
+        double blue(void) const;
+        void blue(double);
+    };
+
+    /* Store x, y coordinates with RGBColor in a convenient way */
+    struct ColorCoordinate : public Coordinate, public RGBColor {
         ColorCoordinate();
-        ColorCoordinate(const Coordinate& coord, const Magick::ColorRGB& color);
+        ColorCoordinate(const Coordinate& coord, const RGBColor& color);
     };
 
     struct BoxCoordinate : public Coordinate {
@@ -37,10 +51,10 @@ namespace PixelSort {
         int max_x, max_y;
         BoundedCoordinate(int x, int y, int width, int height, int max_x, int max_y);
         BoundedCoordinate(BoxCoordinate box, int max_x, int max_y);
-        void clampToMax(int max_x, int max_y);
+        void clampToMax(unsigned int max_x, unsigned int max_y);
     };
 
-    /* We'll be using Pixel a lot */
+    /* We'll be using ColorCoordinate a lot */
     using Pixel = PixelSort::ColorCoordinate;
 
     /* Main storage type */

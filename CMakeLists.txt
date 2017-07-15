@@ -77,9 +77,12 @@ add_library(
     lib/Comparator.cpp
     lib/Matcher.cpp
     lib/PixelSort.cpp
+    lib/driver/MagickDriver.cpp
 )
 include_directories("${PROJECT_SOURCE_DIR}/lib")
+include_directories("${PROJECT_SOURCE_DIR}/lib/driver")
 add_subdirectory(lib)
+add_subdirectory(lib/driver)
 
 ###################################
 # runner setup

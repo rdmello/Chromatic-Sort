@@ -1,14 +1,24 @@
 
 #include "Coordinate.hpp"
 
-PixelSort::Coordinate::Coordinate(int x, int y) : x(x), y(y) {};
+PixelSort::Coordinate::Coordinate(unsigned int x, unsigned int y) : x(x), y(y) {};
+PixelSort::RGBColor::RGBColor(double r, double g, double b) : r(r), g(g), b(b) {};
+
+namespace PixelSort {
+    double RGBColor::red() const {return r;}
+    double RGBColor::green() const {return g;}
+    double RGBColor::blue() const {return b;}
+    void RGBColor::red(double r) { this->r = r; }
+    void RGBColor::green(double g) { this->g = g; }
+    void RGBColor::blue(double b) { this->b = b; }
+};
 
 PixelSort::ColorCoordinate::ColorCoordinate(const PixelSort::Coordinate& coord,
-    const Magick::ColorRGB& color):
-    Coordinate(coord), Magick::ColorRGB(color) {};
+    const RGBColor& color):
+    Coordinate(coord), RGBColor(color) {};
 
 PixelSort::ColorCoordinate::ColorCoordinate():
-    Coordinate(0, 0), Magick::ColorRGB(0, 0, 0) {};
+    Coordinate(0, 0), RGBColor(0, 0, 0) {};
 
 PixelSort::BoxCoordinate::BoxCoordinate(int x, int y, int width, int height)
         :Coordinate(x, y), width(width), height(height) {};
@@ -24,7 +34,7 @@ PixelSort::BoundedCoordinate::BoundedCoordinate(PixelSort::BoxCoordinate box,
     clampToMax(max_x, max_y);
 }
 
-void PixelSort::BoundedCoordinate::clampToMax(int max_x, int max_y) {
+void PixelSort::BoundedCoordinate::clampToMax(unsigned int max_x, unsigned int max_y) {
     this->max_x = max_x;
     this->max_y = max_y;
     this->x = this->x < max_x ? this->x : max_x-1;

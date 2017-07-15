@@ -1,31 +1,24 @@
 
 #include "PixelSort.hpp"
 
-PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box, const GeometryMatcher& matcher)
+PixelSort::PixelVector::PixelVector(Image& image, const BoxCoordinate& box, const GeometryMatcher& matcher)
     : image{image}, box{BoundedCoordinate(box, image.columns(), image.rows())} {
 
     for (int j = 0; j < box.height; ++j) {
         for (int i = 0; i < box.width; ++i) {
-            Pixel coord(Coordinate(i, j), Magick::ColorRGB(0, 0, 0));
+            Pixel coord(Coordinate(i, j), RGBColor(0, 0, 0));
             if (matcher(coord)) {
                 pixels.push_back(coord);
             }
         }
     }
-    
-    const Magick::Quantum* a = image.getConstPixels(box.x, box.y, box.width, box.height);
 
-    for (Pixel& p : pixels) {
-         int idx = 3*(p.x + p.y*box.width);
-         Magick::Color color(a[idx], a[idx+1], a[idx+2]);
-         Magick::ColorRGB rgbColor(color);
-         p.red(rgbColor.red());
-         p.green(rgbColor.green());
-         p.blue(rgbColor.blue());
-     }
- }
+    image.readPrep(box);    
+    for (Pixel& p : pixels) image.readRGBFromXY(p);
+    image.readFinish();
+}
 
-PixelSort::PixelVector::PixelVector(Magick::Image& image, const BoxCoordinate& box)
+PixelSort::PixelVector::PixelVector(Image& image, const BoxCoordinate& box)
     : PixelVector(image, box, GeometryMatcher()) {};
 
 PixelSort::PixelVector::PixelVector(const PixelVector& pv, int start, int end)
@@ -41,15 +34,10 @@ PixelSort::PixelVector::PixelVector(const PixelVector& pv, std::vector<Pixel>::i
 }
 
 void PixelSort::PixelVector::sync() {
-    image.modifyImage();
-    Magick::Quantum* q = image.getPixels(box.x, box.y, box.width, box.height);
-
-    for (const Pixel& p : pixels) {
-        // writeColor(p, &q[(3*(p.x-box.x))+(3*(p.y-box.y)*box.width)]);
-        writeColor(p, &q[(3*p.x)+(3*p.y*box.width)]);
-    }
-
-    image.syncPixels();
+    
+    image.writePrep(box);
+    for (const Pixel& p : pixels) image.writeRGBFromXY(p);
+    image.writeFinish();
 }
 
 /* MATCH FUNCTION */
@@ -94,17 +82,17 @@ void PixelSort::PixelVector::apply(const PixelVector& pv, const ApplyFcn& func) 
 
 // template <typename T1 = PixelSort::Matcher, typename T2 = PixelSort::Comparator>
 template <typename T1 , typename T2 >
-void PixelSort::BlockPixelSort(Magick::Image& image, Coordinate blocksize, 
+void PixelSort::BlockPixelSort(Image& image, Coordinate blocksize, 
                                const T1& matcher, const T2& compare, 
                                const ApplyFcn& applyfcn) {
     /* Normalize into bounded coordinates for safety */
     BoundedCoordinate bounds(0, 0, blocksize.x, blocksize.y, 
                              image.columns(), image.rows());
 
-    while (bounds.y < (signed) image.rows()) {
+    while (bounds.y < image.rows()) {
         bounds.x = 0;
         
-        while (bounds.x < (signed) image.columns()) {
+        while (bounds.x < image.columns()) {
 
             /* Define region-of-interest and make PixelVector */
             PixelVector pv(image, bounds);
@@ -128,19 +116,19 @@ void PixelSort::BlockPixelSort(Magick::Image& image, Coordinate blocksize,
     }
 }
 
-template void PixelSort::BlockPixelSort(Magick::Image& image, 
+template void PixelSort::BlockPixelSort(Image& image, 
     Coordinate blocksize, const Matcher& mat, const Comparator& comp, 
     const ApplyFcn& applyfcn);
 
-template void PixelSort::BlockPixelSort(Magick::Image& image, 
+template void PixelSort::BlockPixelSort(Image& image, 
     Coordinate blocksize, const MatchFcn& mat, const Comparator& comp, 
     const ApplyFcn& applyfcn);
 
-template void PixelSort::BlockPixelSort(Magick::Image& image, 
+template void PixelSort::BlockPixelSort(Image& image, 
     Coordinate blocksize, const Matcher& mat, const CompareFcn& comp, 
     const ApplyFcn& applyfcn);
 
-template void PixelSort::BlockPixelSort(Magick::Image& image, 
+template void PixelSort::BlockPixelSort(Image& image, 
     Coordinate blocksize, const MatchFcn& mat, const CompareFcn& comp, 
     const ApplyFcn& applyfcn);
 
@@ -203,10 +191,4 @@ void PixelSort::PixelVector::print() {
     }
 }
 
-/* utility function */
-void PixelSort::writeColor(const Magick::Color& color, Magick::Quantum* location) {
-    *location = color.quantumRed();
-    *(location+1) = color.quantumGreen();
-    *(location+2) = color.quantumBlue();
-}
 

@@ -6,11 +6,10 @@
 #include <vector>
 #include <iostream>
 
-#include <Magick++.h>
-
 #include "Coordinate.hpp"
 #include "Matcher.hpp"
 #include "Comparator.hpp"
+#include "Image.hpp"
 
 #ifndef _PIXELSORT_PIXELSORT_HPP_
 #define _PIXELSORT_PIXELSORT_HPP_
@@ -32,21 +31,21 @@ namespace PixelSort {
      */
     class PixelVector {
         private:
-            Magick::Image& image;
+            Image& image;
             BoxCoordinate box;
         
         public:
             std::vector<Pixel> pixels;
 
             /* CONSTRUCTOR reading Image into sortable type */
-            PixelVector(Magick::Image& image, const BoxCoordinate& box); 
+            PixelVector(Image& image, const BoxCoordinate& box); 
             
             /* CONSTRUCTOR from PV::iter [first, last) */
             PixelVector(const PixelVector& pv, std::vector<Pixel>::iterator first, 
                         std::vector<Pixel>::iterator last); 
             
             /* CONSTRUCTOR uses generator fcn to read part of Image into sortable type */
-            PixelVector(Magick::Image& image, const BoxCoordinate& box, 
+            PixelVector(Image& image, const BoxCoordinate& box, 
                         const GeometryMatcher& matcher); 
 
             PixelVector(const PixelVector& pv, int start, int end);
@@ -78,7 +77,7 @@ namespace PixelSort {
 
     /* Apply pixelsort operation across block in an image */
     template <typename T1 = Matcher, typename T2 = Comparator>
-    void BlockPixelSort(Magick::Image& image, Coordinate blocksize, 
+    void BlockPixelSort(Image& image, Coordinate blocksize, 
                         const T1& match, const T2& compare, 
                         const ApplyFcn& applyfcn);
 
@@ -86,21 +85,6 @@ namespace PixelSort {
     template <typename T1 = Matcher, typename T2 = Comparator>
     void AsendorfSort(PixelVector& pv, const T1& match, const T2& compare, 
                       const ApplyFcn& applyfcn);
-
-    /* writeColor is a utility function to help convert and write
-     * a Magick::Color to a Quantum triplet
-     */
-    void writeColor(const Magick::Color& color, Magick::Quantum* location);
-
-    /* SortDirection specifies if the sort should be increasing or decreasing
-     * in a specific direction
-     */
-    enum class SortDirection{Inc, Dec};
-
-    /* Outerloop provides a way of distinguishing between sorts that
-     * iterate over the y-direction, and ones that iter over x
-     */
-    enum class OuterLoop{X, Y};
 }
 
 #endif /* _PIXELSORT_PIXELSORT_HPP_ */
