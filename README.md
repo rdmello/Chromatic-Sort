@@ -15,6 +15,8 @@ Provide a simple, easy-to-use, and performant C++ pixelsorting library
 
 4. Use colorpickers instead of three range sliders for min/max matchers
 
+5. Add Zoom and pan controls to the image display
+
 ## Building
 
 1. Install the ImageMagick and Magick++ libraries on your system. You must be able to use the `magick++-config` command on your command line.

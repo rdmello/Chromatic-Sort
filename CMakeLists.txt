@@ -78,11 +78,16 @@ add_library(
     lib/Matcher.cpp
     lib/PixelSort.cpp
     lib/driver/MagickDriver.cpp
+    lib/driver/QImageDriver.cpp
 )
 include_directories("${PROJECT_SOURCE_DIR}/lib")
 include_directories("${PROJECT_SOURCE_DIR}/lib/driver")
 add_subdirectory(lib)
 add_subdirectory(lib/driver)
+target_link_libraries(
+    PixelSortLib
+    Qt5::Widgets
+)
 
 ###################################
 # runner setup
