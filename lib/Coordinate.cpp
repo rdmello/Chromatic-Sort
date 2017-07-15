@@ -39,8 +39,8 @@ void PixelSort::BoundedCoordinate::clampToMax(unsigned int max_x, unsigned int m
     this->max_y = max_y;
     this->x = this->x < max_x ? this->x : max_x-1;
     this->y = this->y < max_y ? this->y : max_y-1;
-    int x_max = this->x + this->width - 1;
-    int y_max = this->y + this->height - 1;
+    unsigned int x_max = this->x + this->width - 1;
+    unsigned int y_max = this->y + this->height - 1;
     this->width = x_max < this->max_x ? this->width : this->max_x - this->x;
     this->height= y_max < this->max_y ? this->height : this->max_y - this->y;
 }
