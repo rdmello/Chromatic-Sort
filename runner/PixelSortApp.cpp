@@ -203,7 +203,7 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     catch(Magick::WarningCoder& warning) 
     {
         statusBar()->showMessage((std::string("Warning: ") + warning.what()).c_str());
-    } 
+    }
     opts.setImage(&img);
     statusBar()->showMessage("New image successfully loaded: " + QString(imageFilePath));
 

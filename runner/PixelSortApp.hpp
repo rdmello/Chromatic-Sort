@@ -26,6 +26,7 @@
 
 // PixelSort includes
 #include "PixelSortOptions.hpp"
+#include "driver/MagickDriver.hpp"
 
 class PixelSortApp : public QMainWindow, public Notifiable
 {

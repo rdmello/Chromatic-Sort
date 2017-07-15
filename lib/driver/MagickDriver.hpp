@@ -17,7 +17,7 @@ namespace PixelSort {
         Magick::Quantum* q;
 
         /* Pointer to ROI being sorted */
-        const BoxCoordinate& box;
+        BoundedCoordinate box;
 
     public:
         MagickDriver(Magick::Image& image, const BoxCoordinate& box);

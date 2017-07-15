@@ -42,13 +42,13 @@ namespace PixelSort {
     };
 
     struct BoxCoordinate : public Coordinate {
-        int width, height;
+        unsigned int width, height;
         BoxCoordinate(int x, int y, int width, int height);
     };
 
     /* Keeps x, y, w, h clamped to limits */
     struct BoundedCoordinate : public BoxCoordinate {
-        int max_x, max_y;
+        unsigned int max_x, max_y;
         BoundedCoordinate(int x, int y, int width, int height, int max_x, int max_y);
         BoundedCoordinate(BoxCoordinate box, int max_x, int max_y);
         void clampToMax(unsigned int max_x, unsigned int max_y);

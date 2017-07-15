@@ -4,13 +4,17 @@
 /*
  * set the reference to the Magick::Image 
  */
-PixelSort::MagickDriver::MagickDriver(Magick::Image& image, const BoxCoordinate& box)
-    :image{image}, box{box} {};
+PixelSort::MagickDriver::MagickDriver(Magick::Image& image, const BoxCoordinate& box):
+image{image}, box{box, int(image.rows()), int(image.columns())} 
+{
+    image.type(Magick::TrueColorType);
+}
 
 void 
 PixelSort::MagickDriver::readPrep (const BoxCoordinate& box)
 {
-    q = image.getPixels(box.x, box.y, box.width, box.height);
+    this->box = PixelSort::BoundedCoordinate(box, int(image.rows()), int(image.columns()));
+    q = image.getPixels(this->box.x, this->box.y, this->box.width, this->box.height);
 }
 
 
@@ -36,7 +40,8 @@ void
 PixelSort::MagickDriver::writePrep (const BoxCoordinate& box)
 {
     image.modifyImage();
-    q = image.getPixels(box.x, box.y, box.width, box.height);
+    this->box = PixelSort::BoundedCoordinate(box, int(image.rows()), int(image.columns()));
+    q = image.getPixels(this->box.x, this->box.y, this->box.width, this->box.height);
 }
 
 
