@@ -5,6 +5,16 @@
 
 Provide a simple, easy-to-use, and performant C++ pixelsorting library
 
+## Todos
+
+1. Add another statusbar entry for image name, dimensions
+
+2. Fix sort rotation selector to allow for more angles
+
+3. Add ability to interface with QImage instead of Magick::Image. This will allow the GUI to be built and packaged in QtCreator, which will greatly help cross-platform deployment
+
+4. Use colorpickers instead of three range sliders for min/max matchers
+
 ## Building
 
 1. Install the ImageMagick and Magick++ libraries on your system. You must be able to use the `magick++-config` command on your command line.
