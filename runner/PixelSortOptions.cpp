@@ -81,8 +81,8 @@ void PixelSortOptions::doSort()
     }
 
     /* Create color matcher */
-    Magick::ColorRGB cMin(colorMatcher[0], colorMatcher[2], colorMatcher[4]);
-    Magick::ColorRGB cMax(colorMatcher[1], colorMatcher[3], colorMatcher[5]);
+    PS::RGBColor cMin(colorMatcher[0], colorMatcher[2], colorMatcher[4]);
+    PS::RGBColor cMax(colorMatcher[1], colorMatcher[3], colorMatcher[5]);
     const PS::Matcher &mat = PS::RGBBandMatcher{cMin, cMax};
 
     /* Create quadMatcher */

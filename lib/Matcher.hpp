@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <Magick++.h>
-
 #include "Coordinate.hpp"
 
 #ifndef _PIXELSORT_MATCHER_HPP_
@@ -84,19 +82,19 @@ namespace PixelSort {
     /* Constructor has two ColorRGB inputs to set internal state
      * of the matcher function */
     struct RGBBandMatcher : public ColorMatcher {
-        RGBBandMatcher(Magick::ColorRGB min, Magick::ColorRGB max);
+        RGBBandMatcher(RGBColor min, RGBColor max);
         virtual bool operator()(const Pixel &color) const;
     private:
-        Magick::ColorRGB min;
-        Magick::ColorRGB max;
+        RGBColor min;
+        RGBColor max;
     };
     /* ColorThreshMatcher matches one specific RGB color within
      * the threshold specified by thresh */
     struct ColorThreshMatcher : public ColorMatcher {
-        ColorThreshMatcher(Magick::ColorRGB color, double radius);
+        ColorThreshMatcher(RGBColor color, double radius);
         virtual bool operator()(const Pixel &color) const;
     private:
-        Magick::ColorRGB color;
+        RGBColor color;
         double radius;
     };
 }

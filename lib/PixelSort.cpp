@@ -1,6 +1,11 @@
 
 #include "PixelSort.hpp"
 
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <functional>
+
 PixelSort::PixelVector::PixelVector(Image& image, const BoxCoordinate& box2, const GeometryMatcher& matcher)
     : image{image}, box{BoundedCoordinate(box2, image.columns(), image.rows())} {
     

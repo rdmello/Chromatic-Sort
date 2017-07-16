@@ -24,9 +24,6 @@
  *  - add partial and tweened gif frame support 
  *  - show progress bar
  * 
- * gui features:
- *  - 
- *
  * gui todos:
  *  - fix native macOS menubar
  *  - save and restore window size and position
@@ -38,14 +35,15 @@
 #include <vector>
 #include <string>
 
-#include <Magick++.h>
-
 #include "boost/program_options.hpp"
 namespace po = boost::program_options;
 
+#include <QImage>
+#include <QString>
+
 #include "PixelSortApp.hpp"
 #include "PixelSortOptions.hpp"
-#include "driver/MagickDriver.hpp"
+#include "driver/QImageDriver.hpp"
 
 /* Logging function
  * Verbosity:
@@ -91,8 +89,6 @@ public:
 };
 
 int main (int argc, char* argv[]) {
-
-    Magick::InitializeMagick("");
 
     /*
      * Branch into GUI app if no input arguments are given
@@ -200,7 +196,7 @@ int main (int argc, char* argv[]) {
 
     /* Necessary variables */
     std::string infile, outfile;
-    Magick::Image img;
+    QImage img;
     PixelSortOptions opts;
     opts.notifyMe = &logger;
 
@@ -230,26 +226,15 @@ int main (int argc, char* argv[]) {
     /* 
      * Read image 
      */
-    try 
-    {
-        logger.log(3, "Reading image file");
-        img.read(infile);
-        
-        /* Prove that image has been successfully read */
-        logger.log(2, "Image successfully read: " + img.fileName());
-        logger.log(2, "Dimensions: " + std::to_string(img.columns())+ " x " + std::to_string(img.rows()));    
-    } 
-    catch(Magick::WarningCoder& warning) 
-    {
-        logger.log(-2, std::string("Warning: ") + warning.what());
-    } 
-    catch (Magick::ErrorFileOpen& error) 
-    {
-        logger.log(-1, std::string("Error while reading image file") + error.what());
-    }
+    logger.log(3, "Reading image file");
+    img.load(infile.c_str());
+
+    /* Prove that image has been successfully read */
+    logger.log(2, "Image successfully read: " + infile);
+    logger.log(2, "Dimensions: " + std::to_string(img.width())+ " x " + std::to_string(img.height()));    
 
     /* Set image options after reading */
-    PS::MagickDriver drv(img, PS::BoxCoordinate(0, 0, img.columns(), img.rows()));
+    PS::QImageDriver drv(img);
     opts.setImage(&drv);
     
     /* 
@@ -490,7 +475,7 @@ int main (int argc, char* argv[]) {
 
     /* Write to output file */
     logger.log(2, "Writing to outfile: " + outfile);
-    img.write(outfile);
+    img.save(outfile.c_str());
 
     return 0;
 }

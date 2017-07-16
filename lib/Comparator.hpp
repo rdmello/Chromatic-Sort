@@ -4,8 +4,6 @@
  * Defines comparator for std::sort with PixelVector
  */
 
-#include <Magick++.h>
-
 #include "Coordinate.hpp"
 
 #ifndef _PIXELSORT_COMPARATOR_HPP_

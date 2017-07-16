@@ -82,7 +82,7 @@ bool PixelSort::BWBandMatcher::operator()(const Pixel &color) const {
 }
 
 
-PixelSort::RGBBandMatcher::RGBBandMatcher(Magick::ColorRGB min, Magick::ColorRGB max): min(min), max(max) {};
+PixelSort::RGBBandMatcher::RGBBandMatcher(RGBColor min, RGBColor max): min(min), max(max) {};
 
 bool PixelSort::RGBBandMatcher::operator()(const Pixel &color) const {
     if ((color.red() <= max.red()) && (color.red() >= min.red()) &&
@@ -98,7 +98,7 @@ bool PixelSort::RGBBandMatcher::operator()(const Pixel &color) const {
 }
 
 
-PixelSort::ColorThreshMatcher::ColorThreshMatcher(Magick::ColorRGB color, double radius): color{color}, radius{radius} {};
+PixelSort::ColorThreshMatcher::ColorThreshMatcher(RGBColor color, double radius): color{color}, radius{radius} {};
 
 bool PixelSort::ColorThreshMatcher::operator()(const Pixel &color) const {
     if ((color.red() < this->color.red() + radius) &&

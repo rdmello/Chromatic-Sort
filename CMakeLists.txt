@@ -43,20 +43,20 @@ find_package(Qt5Widgets)
 #########################################
 # Find and set up ImageMagick
 
-# Default ImageMagick/Magick++ setup
-find_package(ImageMagick 7
-    COMPONENTS Magick++
-    REQUIRED
-)
-
-# Custom ImageMagick/Magick++ setup
-add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=16 )
-add_definitions( -DMAGICKCORE_HDRI_ENABLE=1 )
-
-message(STATUS "Include: ${ImageMagick_INCLUDE_DIRS}")
-message(STATUS "Libs: ${ImageMagick_LIBRARIES}")
-
-include_directories(${ImageMagick_INCLUDE_DIRS})
+# # Default ImageMagick/Magick++ setup
+# find_package(ImageMagick 7
+#     COMPONENTS Magick++
+#     REQUIRED
+# )
+# 
+# # Custom ImageMagick/Magick++ setup
+# add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=16 )
+# add_definitions( -DMAGICKCORE_HDRI_ENABLE=1 )
+# 
+# message(STATUS "Include: ${ImageMagick_INCLUDE_DIRS}")
+# message(STATUS "Libs: ${ImageMagick_LIBRARIES}")
+# 
+# include_directories(${ImageMagick_INCLUDE_DIRS})
 
 ####################################
 # Boost setup
@@ -77,7 +77,6 @@ add_library(
     lib/Comparator.cpp
     lib/Matcher.cpp
     lib/PixelSort.cpp
-    lib/driver/MagickDriver.cpp
     lib/driver/QImageDriver.cpp
 )
 include_directories("${PROJECT_SOURCE_DIR}/lib")
@@ -107,7 +106,7 @@ target_link_libraries(
     pixelsort 
     PixelSortLib
     Qt5::Widgets 
-    ${ImageMagick_LIBRARIES}
+    # ${ImageMagick_LIBRARIES}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
 
@@ -117,7 +116,7 @@ add_executable(runUnitTests test/testSetup.cpp)
 target_link_libraries(
     runUnitTests 
     PixelSortLib 
-    ${ImageMagick_LIBRARIES}
+    #   ${ImageMagick_LIBRARIES}
     gtest 
     gtest_main
 )
