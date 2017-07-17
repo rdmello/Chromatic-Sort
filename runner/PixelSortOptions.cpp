@@ -103,8 +103,7 @@ void PixelSortOptions::doSort()
     /* 
      * Start PixelSorting 
      */
-
-    int numBlocks = std::ceil((Xend - Xstart) / Xpitch) * std::ceil((Yend - Ystart) / Ypitch);
+    int numBlocks = std::ceil(double(Xend - Xstart) / Xpitch) * std::ceil(double(Yend - Ystart) / Ypitch);
     int blocksCompleted = 0;
 
     /* Select a minimal region within the image */
