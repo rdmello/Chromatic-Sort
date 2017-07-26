@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
 #include "PixelSortOptions.hpp"
 
 /* Helper function which generates the correct Applicator
