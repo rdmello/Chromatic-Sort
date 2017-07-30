@@ -1,116 +1,101 @@
 
-# C++ PixelSorting Library
+# Chromatic Sort
 
-## Goal
+This is a desktop application for manipulating images using a graphical technique called "PixelSorting". 
 
-Provide a simple, easy-to-use, and performant C++ pixelsorting library
+Written in C++14 using Qt and cmake, Chromatic Sort contains a high-performance multithreaded core with minimal memory requirements. 
+
+Available soon on Windows, macOS, and Linux operating systems.   
+
+## Download
+
+Standalone downloads should be available soon. Currently, the project has to be built from source to be used. See the 'Building' section below.
+
+## Features
+
+* Provides an interface for two common pixelsort idioms: Asendorf sort and block sort
+
+* Fine grained control of colors and shapes being sorted
+
+* Built-in tools for repeating pixelsort operations through an image
+
+* The app contains both a GUI and a command-line interface for easy scripting
+
+* Image processing back-end is configurable between `QImage`, `Magick::Image`, and `stb_image`
+
+* Written in a cross-platform subset of standard C++14 and compiled using `-Wall -Werror` / `-W4`
+
+* Cross-platform `cmake` project which uses the `Qt` GUI toolkit
+
+## Building
+
+### Installing dependencies
+
+This requires a C++14 compatible compiler. Visual C++ 2017 for Windows, Clang for macOS and g++ for Linux are recommended. 
+
+There are three additional dependencies required: `Qt`, `CMake`, and `boost`:
+
+1. [Download](https://info.qt.io/download-qt-for-application-development) and install the `Qt5` libraries for your system. 
+
+2. [Download](https://cmake.org/download/) and install `cmake` for your system. 
+
+3. There is currently an additional dependency on `boost` which we're trying to phase-out. [Download](http://www.boost.org/users/download/) and install `boost` for your system. Follow the [getting started](http://www.boost.org/doc/libs/1_64_0/more/getting_started/) steps to compile the `Program Options` library.
+
+### Get Chromatic Sort source code
+
+Download or clone this project's source code using 
+```
+git clone https://github.com/rdmello/PixelSort.git --recursive
+```
+
+The `--recursive` flag is required since this project includes `google test` as a Git submodule which is downloaded and compiled to run tests. 
+
+### Build using CMake
+
+An out-of-tree build is recommended with CMake. Here are the steps for this: 
+
+1. Create a new subdirectory in the top-level Chromatic Sort directory called `build` and change working directory to this new subdirectory: 
+
+```
+mkdir build
+cd build
+```
+
+2. Create Makefiles using `cmake`. On Unix (macOS or Linux) platforms, this should be sufficient:
+
+```
+cmake ..
+```
+
+On Windows, you may need to specify the version of Visual Studio and the project bitness: 
+
+```
+cmake .. -G "Visual Studio 15 2017 Win64"
+```
+
+This `cmake` command is essential for correct operation of the executable. If `cmake` shows any errors, you should investigate it and try to fix it. In particular, you may need to set the `CMAKE_PREFIX_PATH` on Windows to help `cmake` find your `Qt` installation. 
+
+3. Building the project using a C++ compiler. On Unix systems, `automake` should just work:
+
+```
+make
+make test
+./pixelsort
+```
+
+On Windows, `cmake` should create a Visual Studio solution file (`.sln`). Open this `.sln` file in the version of Visual Studio used earlier in the `cmake` command. Then build the project and execute it from the GUI. For optimal performance, build in `Release x64` mode. 
 
 ## Todos
 
 1. Add another statusbar entry for image name, dimensions
 
-2. Fix sort rotation selector to allow for more angles
+2. Modify sort rotation selector to allow for more angles
 
-3. [DONE] Add ability to interface with QImage instead of Magick::Image. This will allow the GUI to be built and packaged in QtCreator, which will greatly help cross-platform deployment
+3. Add Zoom and pan controls to the image display
 
-4. [DONE - rejected since it just didn't work well - might revisit] Use colorpickers instead of three range sliders for min/max matchers
-
-5. Add Zoom and pan controls to the image display
-
-## Building
-
-1. Install the ImageMagick and Magick++ libraries on your system. You must be able to use the `magick++-config` command on your command line.
-
-2. Download or clone this project's source code using 
-```
-    git clone https://github.com/rdmello/PixelSort.git
-```
-
-3. Run `make all` and `make run file=interactive` from this directory
-
-## Design
-
-The PixelSorting interface in this code has gone through a large number of iterations to ensure that the resulting library is both generic and powerful.
-
-Here is an overview of the interface:
-
-1. An image can be read using the `Magick::Image` class. Then, it can be converted to a `PixelVector` which is ready for sort operations.
-
-2. This Coordinate array is filtered and reduced using the `ColorMatcher` and `GeometryMatcher` subclasses.  
-
-3. The `PixelVector` is then copied and the copy is sorted using `PixelSorter`. A `PixelSort::Comparator` can also be used to refine the sort.
-
-4. The new sorted `PixelVector` is then zipped with the original unsorted `PixelVector`.
-
-5. The resulting `PixelVector` is written back to the `Magick::Image` which then outputs back to the image file on your filesystem.
-
-## Code Structure
-
-Classes:
-
-* PixelSort::Matcher: AllMatcher, ColorMatcher, BWBandMatcher, RGBBandMatcher, RectangleMatcher, CircleMatcher, LineMatcher
-
-* PixelSort::Coordinate: Coordinate, ColorCoordinate, BoxCoordinate, BoundedCoordinate
-
-* PixelSort::Comparator: SumComparator, RedComparator, GreenComparator, BlueComparator
-
-* PixelSort::Mapper: AllMapper, RedMapper, GreenMapper, BlueMapper
-
-Functions:
-
-* void PixelSort::readImageToColorCoordinateList(
-        Magick::Image& image,
-        std::vector<PixelSort::ColorCoordinate>& pixels
-    )
-
-* PixelSort::writeColorCoordinateListToImage(
-        std::vector<PixelSort::ColorCoordinate>& pixels,
-        Magick::Image& image
-    )
-
-* PixelSort::transformColorCoordinates(
-        std::vector<PixelSort::ColorCoordinate>& pixels,
-        PixelSort::BlockSortDirection& dir
-    )
-
-Main user-facing operations:
-
-1. void PixelSort::ApplyMatcher(
-        std::vector<PixelSort::ColorCoordinate>& pixels,
-        PixelSort::Matcher& matcher
-    )
-    Converts a Magick::Image to a black/white image based on whether each pixel
-    was matched, or if the match failed.
-
-2. void PixelSort::ApplyMapper(
-        std::vector<PixelSort::ColorCoordinate>&  in_pixels,
-        std::vector<PixelSort::ColorCoordinate>& out_pixels,
-        PixelSort::Mapper& mapper
-    )
-    Converts a Magick::Image to a black/white image based on whether each pixel
-    was matched, or if the match failed.
-
-3. void PixelSort::Sort(
-        std::vector<PixelSort::ColorCoordinate>& pixels,
-        PixelSort::Comparator& comp
-    );
-    Carries out a naive block-based pixelsort
-
-4. void PixelSort::AsendorfSort(
-        std::vector<PixelSort::ColorCoordinate>& pixels,
-        PixelSort::Comparator& comp,
-        PixelSort::Matcher& matcher
-    );
-    Does an Asendorf-style sort. Needs a Matcher since AsendorfSort does internal matching
-
-## TBD
-
-1. Refactor Magick++ Image methods to a separate abstract function so that
-other ImProc libraries can be used easily.
+4. Maybe move the GUI toolkit to something non-Qt so that we can release this under a more permissive license?
 
 ## Command-line interface
 
-The PixelSort library should be accessible from a command-line interface. This interface is detailed below:
+The PixelSort application should be accessible from a command-line interface. Type `pixelsort --help` for more information on the options for this. 
 
-1. The command used to launch the pixelsorting application is: 
-    "$ pixelsort inputfilename.png/tiff/gif 
