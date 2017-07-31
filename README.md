@@ -3,6 +3,8 @@
 
 This is a desktop application for manipulating images using a graphical technique called "PixelSorting". 
 
+![Example of PixelSorted Image](http://i.imgur.com/C4ukJqa.png)
+
 Written in C++14 using Qt and cmake, Chromatic Sort contains a high-performance multithreaded core with minimal memory requirements. 
 
 Available soon on Windows, macOS, and Linux operating systems.   
