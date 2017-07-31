@@ -9,6 +9,8 @@ Written in C++14 using Qt and cmake, Chromatic Sort contains a high-performance 
 
 Available soon on Windows, macOS, and Linux operating systems.   
 
+![Cross-platform app image](https://i.imgur.com/VWA6TWW.png)
+
 ## Download
 
 Standalone downloads should be available soon. Currently, the project has to be built from source to be used. See the 'Building' section below.
