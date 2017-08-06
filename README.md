@@ -7,13 +7,15 @@ This is a desktop application for manipulating images using a graphical techniqu
 
 Written in C++14 using Qt and cmake, Chromatic Sort contains a high-performance multithreaded core with minimal memory requirements. 
 
-Available soon on Windows, macOS, and Linux operating systems.   
+Available soon on Windows, macOS, and Linux operating systems. See the "Download" section below.
 
 ![Cross-platform app image](https://i.imgur.com/VWA6TWW.png)
 
 ## Download
 
-Standalone downloads should be available soon. Currently, the project has to be built from source to be used. See the 'Building' section below.
+Standalone downloads for Windows, macOS, and Linux are available [at the Github Releases page for this project](https://github.com/rdmello/Chromatic-Sort/releases).
+
+Alternatively, the project can be built from source using freely available tools on Windows, macOS, or Linux. See the 'Building' section below.
 
 ## Features
 
