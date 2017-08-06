@@ -169,6 +169,7 @@ void PixelSort::AsendorfSort(PixelVector& pv,
             /* Send i to the newest value */
             i = j;
         }
+		if (i >= pv.pixels.end()) break;
     }
 }
 
