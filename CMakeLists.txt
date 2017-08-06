@@ -79,6 +79,7 @@ add_subdirectory(runner)
 # Final executable generation
 add_executable(
     pixelsort 
+    MACOSX_BUNDLE
     runner/PixelSortApp.cpp
     runner/PixelSortOptions.cpp
     runner/interactive.cpp
@@ -108,6 +109,7 @@ install(TARGETS pixelsort DESTINATION bin)
 
 ####################################
 # CPack stuff
+set(CPACK_PACKAGE_NAME "Chromatic Sort")
 include(CPack)
 
 

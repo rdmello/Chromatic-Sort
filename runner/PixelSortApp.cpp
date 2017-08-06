@@ -195,7 +195,7 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // menuBar()->setNativeMenuBar(false);
 
     // Read initial image file
-    imageFilePath = "../resources/lake.png";
+    imageFilePath = "./pixelsort.app/Contents/resources/lake.png";
     img.load(imageFilePath);
     QPixmap newImg = QPixmap::fromImage(img);
     mainImg = scene.addPixmap(newImg);

@@ -90,18 +90,6 @@ public:
 
 int main (int argc, char* argv[]) {
 
-    /*
-     * Branch into GUI app if no input arguments are given
-     * never returns
-     */
-    if (argc <= 1) {
-        QApplication app(argc, argv);
-        PixelSortApp psapp(&app);
-
-        psapp.show();
-        return app.exec();
-    }
-
     /* 
      * SECTION 1: Parsing command-line options using boost::program_options
      */
@@ -159,6 +147,7 @@ int main (int argc, char* argv[]) {
         po::store(
             po::command_line_parser(argc, argv)
                 .options(visible_options)
+                .allow_unregistered()
                 .positional(p)
                 .run(), 
             vm
@@ -211,8 +200,16 @@ int main (int argc, char* argv[]) {
         outfile = infile;
         logger.log(3, "Output filename default: " + outfile);
     } else {
-        logger.log(-1, "No input file found, exiting....");
-        return 1;
+        logger.log(3, "No input file found, opening GUI....");
+        /*
+         * Branch into GUI app if no input arguments are given
+         * never returns
+         */
+        QApplication app(argc, argv);
+        PixelSortApp psapp(&app);
+
+        psapp.show();
+        return app.exec();
     }
 
     /* 
