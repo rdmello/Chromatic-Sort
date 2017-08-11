@@ -3,6 +3,14 @@
 #include <cmath>
 #include <string>
 
+// 
+// Static Release flags 
+// 
+// #define QT_STATICPLUGIN
+// #include <QtCore/QtPlugin>
+// Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
+// 
+
 #include <QImage>
 
 #include "PixelSortApp.hpp"

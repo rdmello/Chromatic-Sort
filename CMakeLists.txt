@@ -2,6 +2,13 @@
 cmake_minimum_required(VERSION 2.8.11)
 project (pixelsort)
 
+# setting some basic properties
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 ####################################
 # Set Wall and Werror
 if(MSVC)
@@ -41,6 +48,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5Widgets)
+
+# release mode for Qt5 on macOS
+# if(APPLE)
+#     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L /Users/Rylan/Desktop/Projects/cpp/Qt/qt-target-5.9/lib -l qtlibpng -lqtpcre2 -lqtfreetype -lqtharfbuzz -L /Users/Rylan/Desktop/Projects/cpp/Qt/qt-target-5.9/plugins/platforms -l Qt5PrintSupport -l Qt5FontDatabaseSupport -l Qt5GraphicsSupport -l Qt5CglSupport -l Qt5AccessibilitySupport -l Qt5ClipboardSupport -l Qt5ThemeSupport -lqcocoa -framework Cocoa -framework CoreText -framework CoreFoundation -framework CoreGraphics -framework CoreServices -lz -lcups -framework OpenGL -framework IOKit -framework Carbon -lQt5Core -lQt5Gui -lQt5Widgets")
+# endif(APPLE)
 
 ####################################
 # Boost setup
