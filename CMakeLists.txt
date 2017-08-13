@@ -62,10 +62,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 ###################################
 # Google Test setup
-cmake_policy(SET CMP0057 NEW)
-cmake_policy(SET CMP0054 NEW)
 enable_testing()
-include(GoogleTest)
 
 # Prevent overriding the parent project's compiler/linker
 # settings on Windows
@@ -131,7 +128,8 @@ target_link_libraries(
     gtest_main
 )
 
-gtest_add_tests(TARGET allTests)
+add_test(testSetup allTests)
+add_test(testInMemDriver allTests)
 
 ####################################
 # Install the executable
