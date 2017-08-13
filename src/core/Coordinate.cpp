@@ -20,16 +20,16 @@ PixelSort::ColorCoordinate::ColorCoordinate(const PixelSort::Coordinate& coord,
 PixelSort::ColorCoordinate::ColorCoordinate():
     Coordinate(0, 0), RGBColor(0, 0, 0) {};
 
-PixelSort::BoxCoordinate::BoxCoordinate(int x, int y, int width, int height)
+PixelSort::BoxCoordinate::BoxCoordinate(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
         :Coordinate(x, y), width(width), height(height) {};
 
-PixelSort::BoundedCoordinate::BoundedCoordinate(int x, int y,
-    int width, int height, int max_x, int max_y)
+PixelSort::BoundedCoordinate::BoundedCoordinate(unsigned int x, unsigned int y,
+    unsigned int width, unsigned int height, unsigned int max_x, unsigned int max_y)
         :BoxCoordinate(x, y, width, height), max_x(max_x), max_y(max_y) {
     clampToMax(max_x, max_y);
 }
 PixelSort::BoundedCoordinate::BoundedCoordinate(PixelSort::BoxCoordinate box, 
-    int max_x, int max_y)
+    unsigned int max_x, unsigned int max_y)
         :BoxCoordinate(box), max_x(max_x), max_y(max_y) {
     clampToMax(max_x, max_y);
 }

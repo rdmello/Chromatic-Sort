@@ -43,23 +43,19 @@ namespace PixelSort {
 
     struct BoxCoordinate : public Coordinate {
         unsigned int width, height;
-        BoxCoordinate(int x, int y, int width, int height);
+        BoxCoordinate(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
     };
 
     /* Keeps x, y, w, h clamped to limits */
     struct BoundedCoordinate : public BoxCoordinate {
         unsigned int max_x, max_y;
-        BoundedCoordinate(int x, int y, int width, int height, int max_x, int max_y);
-        BoundedCoordinate(BoxCoordinate box, int max_x, int max_y);
+        BoundedCoordinate(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned int max_x, unsigned int max_y);
+        BoundedCoordinate(BoxCoordinate box, unsigned int max_x, unsigned int max_y);
         void clampToMax(unsigned int max_x, unsigned int max_y);
     };
 
     /* We'll be using ColorCoordinate a lot */
     using Pixel = PixelSort::ColorCoordinate;
-
-    /* Main storage type */
-    // using PixelVector = std::vector<Pixel>;
-
 }
 
 #endif /* _PIXELSORT_COORDINATE_HPP_ */

@@ -5,7 +5,8 @@
  * set the reference to the QImage
  */
 PixelSort::QImageDriver::QImageDriver(QImage& image):
-image{image}, box{0, 0, image.width(), image.height()}
+image{image}, 
+box{0, 0, static_cast<unsigned int>(image.width()), static_cast<unsigned int>(image.height())}
 {
     /* do nothing */
 }

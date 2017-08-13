@@ -74,6 +74,7 @@ add_library(
     src/core/Comparator.cpp
     src/core/Matcher.cpp
     src/core/PixelSort.cpp
+    src/core/driver/InMemDriver.cpp
     src/core/driver/QImageDriver.cpp
 )
 include_directories("${PROJECT_SOURCE_DIR}/src/core")

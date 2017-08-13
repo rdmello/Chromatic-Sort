@@ -1,10 +1,19 @@
 
 #include "PixelSort.hpp"
+#include "InMemDriver.hpp"
+
 #include "gtest/gtest.h"
 
+namespace PS = PixelSort;
+
 TEST(addTwoNumbers, CoordinateTest) {
-    PixelSort::Coordinate co{100, 200};
-    EXPECT_EQ(unsigned(100), co.x);
-    EXPECT_EQ(unsigned(200), co.y);
+    
+    PS::Coordinate co{10, 20};
+    EXPECT_EQ(unsigned(10), co.x);
+    EXPECT_EQ(unsigned(20), co.y);
+
+    PS::InMemDriver image(co, PS::BoxCoordinate(0, 0, 10, 20));
+    image.print();
+
 }
 
