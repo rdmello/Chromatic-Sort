@@ -10,6 +10,7 @@ namespace PixelSort {
 
     class InMemDriver : public Image
     {
+    public:
         /* image object */
         std::vector<std::vector<RGBColor>> pixels;
 
@@ -19,7 +20,6 @@ namespace PixelSort {
         /* Pointer to ROI being sorted */
         BoundedCoordinate box;
        
-    public:
         InMemDriver(const Coordinate& maxExtent, const BoxCoordinate& box);
         virtual unsigned int columns (void) const;
         virtual unsigned int rows    (void) const;

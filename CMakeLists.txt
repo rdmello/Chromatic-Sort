@@ -62,8 +62,16 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 ###################################
 # Google Test setup
-add_subdirectory(googletest)
+cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0054 NEW)
 enable_testing()
+include(GoogleTest)
+
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 ###################################
@@ -110,14 +118,20 @@ target_link_libraries(
 
 ###################################
 # unit tests
-add_executable(runUnitTests test/testSetup.cpp)
+add_executable(
+    allTests 
+    test/testSetup.cpp
+    test/core/driver/testInMemDriver.cpp
+)
+
 target_link_libraries(
-    runUnitTests 
+    allTests 
     PixelSortLib 
     gtest 
     gtest_main
 )
-add_test(runUnitTests runUnitTests)
+
+gtest_add_tests(TARGET allTests)
 
 ####################################
 # Install the executable
