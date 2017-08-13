@@ -70,34 +70,34 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # PixelSort library setup
 add_library(
     PixelSortLib
-    lib/Coordinate.cpp
-    lib/Comparator.cpp
-    lib/Matcher.cpp
-    lib/PixelSort.cpp
-    lib/driver/QImageDriver.cpp
+    src/core/Coordinate.cpp
+    src/core/Comparator.cpp
+    src/core/Matcher.cpp
+    src/core/PixelSort.cpp
+    src/core/driver/QImageDriver.cpp
 )
-include_directories("${PROJECT_SOURCE_DIR}/lib")
-include_directories("${PROJECT_SOURCE_DIR}/lib/driver")
-add_subdirectory(lib)
-add_subdirectory(lib/driver)
+include_directories("${PROJECT_SOURCE_DIR}/src/core")
+include_directories("${PROJECT_SOURCE_DIR}/src/core/driver")
+add_subdirectory(src/core)
+add_subdirectory(src/core/driver)
 target_link_libraries(
     PixelSortLib
     Qt5::Widgets
 )
 
 ###################################
-# runner setup
-include_directories("${PROJECT_SOURCE_DIR}/runner")
-add_subdirectory(runner)
+# GUI setup
+include_directories("${PROJECT_SOURCE_DIR}/src/gui-qt")
+add_subdirectory(src/gui-qt)
 
 ###################################
 # Final executable generation
 add_executable(
     pixelsort 
     MACOSX_BUNDLE
-    runner/PixelSortApp.cpp
-    runner/PixelSortOptions.cpp
-    runner/interactive.cpp
+    src/gui-qt/PixelSortApp.cpp
+    src/gui-qt/PixelSortOptions.cpp
+    src/gui-qt/interactive.cpp
 )
 
 target_link_libraries(
