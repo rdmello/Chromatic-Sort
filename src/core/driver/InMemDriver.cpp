@@ -7,9 +7,9 @@
  * build the InMemImage
  */
 PixelSort::InMemDriver::InMemDriver(const Coordinate& maxExtent, const BoxCoordinate& box):
-pixels{maxExtent.y, std::vector<RGBColor>{maxExtent.y, RGBColor(0.5, 0.6, 0.7)}},
+pixels{maxExtent.y, std::vector<RGBColor>{maxExtent.x, RGBColor(0.5, 0.6, 0.7)}},
 boxExtent{maxExtent}, 
-box{box, maxExtent.y, maxExtent.x} {}
+box{box, maxExtent.x, maxExtent.y} {}
 
 void 
 PixelSort::InMemDriver::readPrep (const BoxCoordinate& box)

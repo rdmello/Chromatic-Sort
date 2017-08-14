@@ -5,7 +5,6 @@
  */
 
 #include "PixelSort.hpp"
-#include "InMemDriver.hpp"
 
 #include "gtest/gtest.h"
 
