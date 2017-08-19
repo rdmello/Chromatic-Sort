@@ -6,10 +6,9 @@
 /*
  * build the InMemImage
  */
-PixelSort::InMemDriver::InMemDriver(const Coordinate& maxExtent, const BoxCoordinate& box):
-pixels{maxExtent.y, std::vector<RGBColor>{maxExtent.x, RGBColor(0.5, 0.6, 0.7)}},
-boxExtent{maxExtent}, 
-box{box, maxExtent.x, maxExtent.y} {}
+PixelSort::InMemDriver::InMemDriver(std::vector<std::vector<RGBColor>>& pixels, const BoxCoordinate& box):
+pixels{pixels},
+box{box, unsigned(pixels[0].size()), unsigned(pixels.size())} {}
 
 void 
 PixelSort::InMemDriver::readPrep (const BoxCoordinate& box)
@@ -17,11 +16,10 @@ PixelSort::InMemDriver::readPrep (const BoxCoordinate& box)
     /* do nothing */
 }
 
-
 void 
 PixelSort::InMemDriver::readRGBFromXY (Pixel& p) const
 {
-    RGBColor rgbColor = pixels[p.y][p.x];
+    RGBColor rgbColor = pixels[p.y + box.y][p.x + box.x];
 
     p.red(rgbColor.red());
     p.green(rgbColor.green());
@@ -44,7 +42,7 @@ PixelSort::InMemDriver::writePrep (const BoxCoordinate& box)
 void 
 PixelSort::InMemDriver::writeRGBFromXY (const Pixel& p)
 {
-    pixels[p.y][p.x] = RGBColor(p.red(), p.green(), p.blue());
+    pixels[p.y + box.y][p.x + box.x] = RGBColor(p.red(), p.green(), p.blue());
 }
 
 void 
@@ -56,13 +54,13 @@ PixelSort::InMemDriver::writeFinish (void)
 unsigned int
 PixelSort::InMemDriver::columns (void) const
 {
-    return pixels[0].size();
+    return box.width;
 }
 
 unsigned int
 PixelSort::InMemDriver::rows (void) const
 {
-    return pixels.size();
+    return box.height;
 }
 
 void

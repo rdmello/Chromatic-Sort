@@ -1,4 +1,10 @@
 
+/*
+ * InMemDriver is an interface for in-memory image objects
+ * this class allows us to use vector<vector<RGBColor>> objects with
+ * BlockPixelSort, AsendorfSort, etc.
+ */
+
 #include "../Image.hpp"
 
 #ifndef _PIXELSORT_DRIVER_INMEM_HPP_
@@ -10,17 +16,15 @@ namespace PixelSort {
 
     class InMemDriver : public Image
     {
+      
     public:
         /* image object */
-        std::vector<std::vector<RGBColor>> pixels;
+        std::vector<std::vector<RGBColor>>& pixels;
 
-        /* Actual extent of in-memory image */
-        Coordinate boxExtent;
-
-        /* Pointer to ROI being sorted */
+        /* ROI being sorted */
         BoundedCoordinate box;
-       
-        InMemDriver(const Coordinate& maxExtent, const BoxCoordinate& box);
+ 
+        InMemDriver(std::vector<std::vector<RGBColor>>& pixels, const BoxCoordinate& box);
         virtual unsigned int columns (void) const;
         virtual unsigned int rows    (void) const;
 
