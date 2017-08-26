@@ -16,10 +16,12 @@
 #include <QGraphicsView>
 #include <QPixmap>
 #include <QColor>
+#include <QAction>
 #include <QGraphicsPixmapItem>
 
 #include <QFileDialog>
 #include <QPushButton>
+#include <QKeySequence>
 
 // PixelSort includes
 #include "PixelSortOptions.hpp"

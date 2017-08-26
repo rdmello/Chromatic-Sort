@@ -67,7 +67,18 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     dockwidget.setAllowedAreas(Qt::LeftDockWidgetArea);
     dockwidget.setFeatures(QDockWidget::NoDockWidgetFeatures);
     dockwidget.setWidget(&dockwidget_mid);
-        
+     
+    // Set up menubar actions
+    QAction* openAction = fileMenu.addAction("&Open");
+    QAction* saveAction = fileMenu.addAction("&Save");
+    openAction->setShortcuts(QKeySequence::Open);
+    saveAction->setShortcuts(QKeySequence::Save);
+    
+    // Set up menubar
+    menuBar()->addMenu(&fileMenu);
+    menuBar()->addAction(fileMenu.menuAction());
+    menuBar()->show();
+
     // add import and export button to vbox
     vbox.addWidget(&importbutton);
     vbox.addWidget(&exportbutton);
@@ -77,19 +88,23 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     fileimport.setAcceptMode(QFileDialog::AcceptOpen);
     fileimport.setNameFilter("Images (*.png *.tiff *.tif)");
     fileimport.fileSelected(imageFilePath);
+    // reload image view after importing 
+    QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), this, SLOT(reloadImage(QString)));
 
     // file export dialog settings
     fileexport.setFileMode(QFileDialog::AnyFile);
     fileexport.setAcceptMode(QFileDialog::AcceptSave);
-
-    // Connect actual import button events
-    QObject::connect(&importbutton, SIGNAL(clicked()), &fileimport, SLOT(exec()));
-    QObject::connect(&fileimport, SIGNAL(fileSelected(QString)), this, SLOT(reloadImage(QString)));
- 
-    // Connect actual export button events
-    QObject::connect(&exportbutton, SIGNAL(clicked()), &fileexport, SLOT(exec()));
+    // write image after selecting export filename
     QObject::connect(&fileexport, SIGNAL(fileSelected(QString)), this, SLOT(writeImage(QString)));
- 
+
+    // Set up openAction and saveAction
+    QObject::connect(openAction, &QAction::triggered, &fileimport, &QFileDialog::exec);
+    QObject::connect(saveAction, &QAction::triggered, &fileexport, &QFileDialog::exec);
+   
+    // Connect import and export button events
+    QObject::connect(&importbutton, &QPushButton::clicked, openAction, &QAction::trigger);
+    QObject::connect(&exportbutton, &QPushButton::clicked, saveAction, &QAction::trigger);
+
     // Set up the form layout widget 
     vbox.addLayout(&formlayout);
     formlayout.setLabelAlignment(Qt::AlignCenter);
@@ -193,14 +208,6 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // add quit button to vbox
     // vbox.addWidget(&quitbutton);
     // QObject::connect(&quitbutton, SIGNAL(clicked()), appPtr, SLOT(quit()));
-
-    // Set up menubar
-    fileMenu.addAction("Item 1");
-    fileMenu.addAction("Item 2");
-    menuBar()->addMenu(&fileMenu);
-    menuBar()->addAction(fileMenu.menuAction());
-    menuBar()->show();
-    // menuBar()->setNativeMenuBar(false);
 
     // Read initial image file
     imageFilePath = "./pixelsort.app/Contents/resources/lake.png";

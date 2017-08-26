@@ -96,10 +96,10 @@ void PixelSortOptions::doSort()
     /* Create Xrepeat, Yrepeat parameters */
     int Xstart = Xrepeat[0];
     int Xpitch = Xrepeat[1];
-    int Xend   = img->columns() < unsigned(Xrepeat[2]) ? img->columns() : Xrepeat[2];
+    int Xend = img->columns(); // not controllable yet
     int Ystart = Yrepeat[0];
     int Ypitch = Yrepeat[1];
-    int Yend   = img->rows() < unsigned(Yrepeat[2]) ? img->rows() : Yrepeat[2];
+    int Yend = img->rows(); // not controllable yet
 
     /* 
      * Start PixelSorting 
