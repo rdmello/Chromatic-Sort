@@ -19,12 +19,12 @@ namespace PixelSort {
       
     public:
         /* image object */
-        std::vector<std::vector<RGBColor>>& pixels;
+        std::vector<std::vector<RGBAColor>>& pixels;
 
         /* ROI being sorted */
         BoundedCoordinate box;
  
-        InMemDriver(std::vector<std::vector<RGBColor>>& pixels, const BoxCoordinate& box);
+        InMemDriver(std::vector<std::vector<RGBAColor>>& pixels, const BoxCoordinate& box);
         virtual unsigned int columns (void) const;
         virtual unsigned int rows    (void) const;
 
@@ -37,7 +37,6 @@ namespace PixelSort {
         virtual void writeFinish (void);
 
         void print(void) const;
-
     };
 }
 

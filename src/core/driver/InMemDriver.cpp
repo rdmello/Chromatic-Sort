@@ -6,7 +6,8 @@
 /*
  * build the InMemImage
  */
-PixelSort::InMemDriver::InMemDriver(std::vector<std::vector<RGBColor>>& pixels, const BoxCoordinate& box):
+PixelSort::InMemDriver::InMemDriver(
+    std::vector<std::vector<RGBAColor>>& pixels, const BoxCoordinate& box):
 pixels{pixels},
 box{box, unsigned(pixels[0].size()), unsigned(pixels.size())} {}
 
@@ -19,11 +20,8 @@ PixelSort::InMemDriver::readPrep (const BoxCoordinate& box)
 void 
 PixelSort::InMemDriver::readRGBFromXY (Pixel& p) const
 {
-    RGBColor rgbColor = pixels[p.y + box.y][p.x + box.x];
-
-    p.red(rgbColor.red());
-    p.green(rgbColor.green());
-    p.blue(rgbColor.blue());
+    RGBAColor pixel = pixels[p.y + box.y][p.x + box.x];
+    p = Pixel{p.x, p.y, pixel.color};
 }
 
 void 
@@ -42,7 +40,7 @@ PixelSort::InMemDriver::writePrep (const BoxCoordinate& box)
 void 
 PixelSort::InMemDriver::writeRGBFromXY (const Pixel& p)
 {
-    pixels[p.y + box.y][p.x + box.x] = RGBColor(p.red(), p.green(), p.blue());
+    pixels[p.y + box.y][p.x + box.x] = RGBAColor{p.color};
 }
 
 void 
@@ -66,11 +64,12 @@ PixelSort::InMemDriver::rows (void) const
 void
 PixelSort::InMemDriver::print(void) const
 {
-    for(const std::vector<RGBColor>& row: pixels) {
-        for(const RGBColor& color: row) {
-            std::cout << "(" << color.red() << "," 
-                      << color.green() << "," << color.blue() << ") ";
+    std::cout << std::hex;
+    for(const std::vector<RGBAColor>& row: pixels) {
+        for(const RGBAColor& color: row) {
+            std::cout << color.color << " ";
         }
         std::cout << std::endl;
     }
+    std::cout << std::dec;
 }

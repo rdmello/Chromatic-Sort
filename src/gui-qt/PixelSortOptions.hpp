@@ -1,9 +1,9 @@
 
-#include "PixelSort.hpp"
-namespace PS = PixelSort;
-
 #ifndef _PIXELSORT_RUNNER_SORTOPTIONS_
 #define _PIXELSORT_RUNNER_SORTOPTIONS_
+
+#include "PixelSort.hpp"
+namespace PS = PixelSort;
 
 struct Notifiable
 {

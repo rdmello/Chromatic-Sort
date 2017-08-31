@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <cstdint>
+
 #include "PixelSortOptions.hpp"
 
 /* Helper function which generates the correct Applicator
@@ -82,8 +84,14 @@ void PixelSortOptions::doSort()
     }
 
     /* Create color matcher */
-    PS::RGBColor cMin(colorMatcher[0], colorMatcher[2], colorMatcher[4]);
-    PS::RGBColor cMax(colorMatcher[1], colorMatcher[3], colorMatcher[5]);
+    PS::RGBAColor cMin, cMax;
+    cMin.red(static_cast<uint8_t>(colorMatcher[0] * 255));
+    cMax.red(static_cast<uint8_t>(colorMatcher[1] * 255));
+    cMin.green(static_cast<uint8_t>(colorMatcher[2] * 255));
+    cMax.green(static_cast<uint8_t>(colorMatcher[3] * 255));
+    cMin.blue(static_cast<uint8_t>(colorMatcher[4] * 255));
+    cMax.blue(static_cast<uint8_t>(colorMatcher[5] * 255));
+    
     const PS::Matcher &mat = PS::RGBBandMatcher{cMin, cMax};
 
     /* Create quadMatcher */

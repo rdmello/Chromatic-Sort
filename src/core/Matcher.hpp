@@ -5,6 +5,7 @@
  */
 
 #include <vector>
+#include <cstdint>
 
 #include "Coordinate.hpp"
 
@@ -72,29 +73,30 @@ namespace PixelSort {
     /* Constructor has two inputs to set internal state
      * of the matcher function */
     struct BWBandMatcher : public ColorMatcher {
-        BWBandMatcher(double th_low, double th_high);
+        BWBandMatcher(uint8_t th_low, uint8_t th_high);
         virtual bool operator()(const Pixel &color) const;
     private:
-        double pool_threshold_low;
-        double pool_threshold_high;
+        uint8_t pool_threshold_low;
+        uint8_t pool_threshold_high;
     };
 
     /* Constructor has two ColorRGB inputs to set internal state
      * of the matcher function */
     struct RGBBandMatcher : public ColorMatcher {
-        RGBBandMatcher(RGBColor min, RGBColor max);
+        RGBBandMatcher(RGBAColor min, RGBAColor max);
         virtual bool operator()(const Pixel &color) const;
     private:
-        RGBColor min;
-        RGBColor max;
+        uint8_t rMin, gMin, bMin;
+        uint8_t rMax, gMax, bMax;
     };
+
     /* ColorThreshMatcher matches one specific RGB color within
      * the threshold specified by thresh */
     struct ColorThreshMatcher : public ColorMatcher {
-        ColorThreshMatcher(RGBColor color, double radius);
+        ColorThreshMatcher(RGBAColor color, double radius);
         virtual bool operator()(const Pixel &color) const;
     private:
-        RGBColor color;
+        RGBAColor color;
         double radius;
     };
 }

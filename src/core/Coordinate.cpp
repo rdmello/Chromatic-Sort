@@ -1,33 +1,35 @@
 
 #include "Coordinate.hpp"
 
-PixelSort::Coordinate::Coordinate(unsigned int x, unsigned int y) : x(x), y(y) {};
-PixelSort::RGBColor::RGBColor(double r, double g, double b) : r(r), g(g), b(b) {};
+#include <iostream>
 
 namespace PixelSort {
-    double RGBColor::red() const {return r;}
-    double RGBColor::green() const {return g;}
-    double RGBColor::blue() const {return b;}
-    void RGBColor::red(double r) { this->r = r; }
-    void RGBColor::green(double g) { this->g = g; }
-    void RGBColor::blue(double b) { this->b = b; }
+    uint8_t RGBAColor::red() const {return (color & 0x00FF0000) >> 16;}
+    uint8_t RGBAColor::green() const {return (color & 0x0000FF00) >> 8;}
+    uint8_t RGBAColor::blue() const {return (color & 0x000000FF);}
+    void RGBAColor::red(uint32_t r) { color = (color & 0xFF00FFFF) + ((r << 16) & 0x00FF0000); }
+    void RGBAColor::green(uint32_t g) { color = (color & 0xFFFF00FF) + ((g << 8) & 0x0000FF00); }
+    void RGBAColor::blue(uint32_t b) { color = (color & 0xFFFFFF00) + (b & 0x000000FF); }
 };
 
-PixelSort::ColorCoordinate::ColorCoordinate(const PixelSort::Coordinate& coord,
-    const RGBColor& color):
-    Coordinate(coord), RGBColor(color) {};
-
-PixelSort::ColorCoordinate::ColorCoordinate():
-    Coordinate(0, 0), RGBColor(0, 0, 0) {};
+namespace PixelSort {
+    uint8_t Pixel::red() const {return (color & 0x00FF0000) >> 16;}
+    uint8_t Pixel::green() const {return (color & 0x0000FF00) >> 8;}
+    uint8_t Pixel::blue() const {return (color & 0x000000FF);}
+    void Pixel::red(uint32_t r) { color = (color & 0xFF00FFFF) + ((r << 16) & 0x00FF0000); }
+    void Pixel::green(uint32_t g) { color = (color & 0xFFFF00FF) + ((g << 8) & 0x0000FF00); }
+    void Pixel::blue(uint32_t b) { color = (color & 0xFFFFFF00) + (b & 0x000000FF); }
+};
 
 PixelSort::BoxCoordinate::BoxCoordinate(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-        :Coordinate(x, y), width(width), height(height) {};
+        :Coordinate{x, y}, width(width), height(height) {};
 
 PixelSort::BoundedCoordinate::BoundedCoordinate(unsigned int x, unsigned int y,
     unsigned int width, unsigned int height, unsigned int max_x, unsigned int max_y)
         :BoxCoordinate(x, y, width, height), max_x(max_x), max_y(max_y) {
     clampToMax(max_x, max_y);
 }
+
 PixelSort::BoundedCoordinate::BoundedCoordinate(PixelSort::BoxCoordinate box, 
     unsigned int max_x, unsigned int max_y)
         :BoxCoordinate(box), max_x(max_x), max_y(max_y) {

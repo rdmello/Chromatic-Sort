@@ -95,6 +95,7 @@ target_link_libraries(
 add_executable(
     allTests 
     test/testSetup.cpp
+    test/core/testCoordinate.cpp
     test/core/driver/testInMemDriver.cpp
 )
 
@@ -106,6 +107,7 @@ target_link_libraries(
 )
 
 add_test(testSetup allTests)
+add_test(testCoordinate allTests)
 add_test(testInMemDriver allTests)
 
 ####################################

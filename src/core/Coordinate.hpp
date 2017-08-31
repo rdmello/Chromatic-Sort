@@ -1,6 +1,4 @@
 
-#include <vector>
-
 /*
  * Coordinate.hpp
  * The Coordinate class and its subclasses provide
@@ -11,34 +9,45 @@
 #ifndef _PIXELSORT_COORDINATE_HPP_
 #define _PIXELSORT_COORDINATE_HPP_
 
+#include <cstdint>
+
 namespace PixelSort {
 
     /* Store x, y coordinates in convenient way */
-    struct Coordinate {
+    struct Coordinate 
+    {
         unsigned int x, y;
-        Coordinate(unsigned int x, unsigned int y);
+        // Coordinate(unsigned int x, unsigned int y);
     };
 
-    /* Store RGB colors between 0 to 1 */
-    struct RGBColor {
-        double r, g, b;
-
-        RGBColor(double r, double g, double b);
+    /* Store ARGB colors between 0 to 255 */
+    struct RGBAColor
+    {
+        unsigned int color;
         
-        double red(void) const;
-        void red(double);
+        uint8_t red(void) const;
+        void red(uint32_t);
         
-        double green(void) const;
-        void green(double);
+        uint8_t green(void) const;
+        void green(uint32_t);
         
-        double blue(void) const;
-        void blue(double);
+        uint8_t blue(void) const;
+        void blue(uint32_t);
     };
-
-    /* Store x, y coordinates with RGBColor in a convenient way */
-    struct ColorCoordinate : public Coordinate, public RGBColor {
-        ColorCoordinate();
-        ColorCoordinate(const Coordinate& coord, const RGBColor& color);
+    
+    /* Store x, y coordinates with RGBAColor in a convenient way */
+    struct ColorCoordinate 
+    {
+        unsigned int x, y, color;
+        
+        uint8_t red(void) const;
+        void red(uint32_t);
+        
+        uint8_t green(void) const;
+        void green(uint32_t);
+        
+        uint8_t blue(void) const;
+        void blue(uint32_t);
     };
 
     struct BoxCoordinate : public Coordinate {

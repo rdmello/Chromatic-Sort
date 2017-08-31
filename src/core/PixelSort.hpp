@@ -20,12 +20,8 @@ namespace PixelSort {
     using CompareFcn = bool (*)(const Pixel&, const Pixel&);
     using ApplyFcn = Pixel (*)(const Pixel&, const Pixel&);
 
-    /* GenerateFcn is a function which accepts an empty std::vector<Pixel>
-     * and returns the Pixels matched 
-     */
-    // using GenerateFcn = void (*)(std::vector<Pixel>& pixels, const BoxCoordinate& box);
-
-    /* PixelVector is the main class which maintains a vector of Pixel objects
+    /* 
+     * PixelVector is the main class which maintains a vector of Pixel objects
      * and provides a set of methods to update pixels and keep them in sync
      * with the Magick::Image object
      */
@@ -50,7 +46,7 @@ namespace PixelSort {
 
             PixelVector(const PixelVector& pv, int start, int end);
 
-            /* Writes PixelVector to Magick::Image */
+            /* Writes PixelVector to PS::Image */
             void sync();
 
             /* Apply matcher 

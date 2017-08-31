@@ -289,10 +289,9 @@ void PixelSortApp::notify(const char* str)
 {
     statusBar()->showMessage(str);
     appPtr->processEvents();
-    QPixmap newImg = QPixmap::fromImage(img);
-    mainImg->setPixmap(newImg);
-    updateScene(newImg);
-
+    // QPixmap newImg = QPixmap::fromImage(img);
+    // mainImg->setPixmap(newImg);
+    // updateScene(newImg);
 }
 
 void PixelSortApp::distXset(int newval)

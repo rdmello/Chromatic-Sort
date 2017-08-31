@@ -21,11 +21,7 @@ PixelSort::QImageDriver::readPrep (const BoxCoordinate& box)
 void 
 PixelSort::QImageDriver::readRGBFromXY (Pixel& p) const
 {
-    QColor rgbColor = image.pixelColor(box.x + p.x, box.y + p.y);
-
-    p.red(rgbColor.redF());
-    p.green(rgbColor.greenF());
-    p.blue(rgbColor.blueF());
+    p.color = image.pixel(box.x + p.x, box.y + p.y);
 }
 
 void 
@@ -44,8 +40,7 @@ PixelSort::QImageDriver::writePrep (const BoxCoordinate& box)
 void 
 PixelSort::QImageDriver::writeRGBFromXY (const Pixel& p)
 {
-    QColor color = QColor::fromRgbF(p.red(), p.green(), p.blue());
-    image.setPixelColor(box.x + p.x, box.y + p.y, color);
+    image.setPixelColor(box.x + p.x, box.y + p.y, p.color);
 }
 
 void 

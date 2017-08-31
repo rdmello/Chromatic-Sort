@@ -12,7 +12,7 @@ PixelSort::PixelVector::PixelVector(Image& image, const BoxCoordinate& box2, con
     
     for (unsigned int j = 0; j < box.height; ++j) {
         for (unsigned int i = 0; i < box.width; ++i) {
-            Pixel coord(Coordinate(i, j), RGBColor(0, 0, 0));
+            Pixel coord{i, j, 0x00000000};
             if (matcher(coord)) {
                 pixels.push_back(coord);
             }
