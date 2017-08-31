@@ -36,7 +36,7 @@ There are three additional dependencies required: `Qt`, `CMake`, and `boost`:
 ### Get Chromatic Sort source code
 Download or clone this project's source code using 
 ```
-git clone https://github.com/rdmello/PixelSort.git --recursive
+git clone https://github.com/rdmello/Chromatic-Sort.git --recursive
 ```
 The `--recursive` flag is required since this project includes `google test` as a Git submodule which is downloaded and compiled to run tests. 
 

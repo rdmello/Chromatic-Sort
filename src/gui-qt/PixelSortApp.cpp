@@ -210,7 +210,7 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     // QObject::connect(&quitbutton, SIGNAL(clicked()), appPtr, SLOT(quit()));
 
     // Read initial image file
-    imageFilePath = "./pixelsort.app/Contents/resources/lake.png";
+    imageFilePath = "./ChromaticSort.app/Contents/resources/lake.png";
     img.load(imageFilePath);
     QPixmap newImg = QPixmap::fromImage(img);
     mainImg = scene.addPixmap(newImg);

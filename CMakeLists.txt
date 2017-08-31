@@ -1,6 +1,6 @@
 
 cmake_minimum_required(VERSION 2.8.11)
-project (pixelsort)
+project (ChromaticSort)
 
 # setting some basic properties
 if (NOT CMAKE_BUILD_TYPE)
@@ -74,7 +74,7 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 ###################################
 # PixelSort library setup
 add_library(
-    PixelSortLib
+    ChromaticSortLib
     src/core/Coordinate.cpp
     src/core/Comparator.cpp
     src/core/Matcher.cpp
@@ -87,7 +87,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/core/driver")
 add_subdirectory(src/core)
 add_subdirectory(src/core/driver)
 target_link_libraries(
-    PixelSortLib
+    ChromaticSortLib
     Qt5::Widgets
 )
 
@@ -99,7 +99,7 @@ add_subdirectory(src/gui-qt)
 ###################################
 # Final executable generation
 add_executable(
-    pixelsort 
+    ChromaticSort
     MACOSX_BUNDLE
     src/gui-qt/PixelSortApp.cpp
     src/gui-qt/PixelSortOptions.cpp
@@ -107,8 +107,8 @@ add_executable(
 )
 
 target_link_libraries(
-    pixelsort 
-    PixelSortLib
+    ChromaticSort
+    ChromaticSortLib
     Qt5::Widgets 
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
 )
@@ -123,7 +123,7 @@ add_executable(
 
 target_link_libraries(
     allTests 
-    PixelSortLib 
+    ChromaticSortLib 
     gtest 
     gtest_main
 )
@@ -133,7 +133,7 @@ add_test(testInMemDriver allTests)
 
 ####################################
 # Install the executable
-install(TARGETS pixelsort DESTINATION bin)
+install(TARGETS ChromaticSort DESTINATION bin)
 
 ####################################
 # CPack stuff
