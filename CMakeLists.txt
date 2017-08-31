@@ -84,8 +84,8 @@ add_library(
 )
 include_directories("${PROJECT_SOURCE_DIR}/src/core")
 include_directories("${PROJECT_SOURCE_DIR}/src/core/driver")
-add_subdirectory(src/core)
-add_subdirectory(src/core/driver)
+# add_subdirectory(src/core)
+# add_subdirectory(src/core/driver)
 target_link_libraries(
     ChromaticSortLib
     Qt5::Widgets
@@ -94,7 +94,7 @@ target_link_libraries(
 ###################################
 # GUI setup
 include_directories("${PROJECT_SOURCE_DIR}/src/gui-qt")
-add_subdirectory(src/gui-qt)
+# add_subdirectory(src/gui-qt)
 
 ###################################
 # Final executable generation
