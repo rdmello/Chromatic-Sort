@@ -29,6 +29,13 @@ namespace PixelSort {
         double blueX;
     };
 
+    struct BoolWeightedComparator : public Comparator {
+        BoolWeightedComparator(bool redX, bool greenX, bool blueX); 
+        bool operator()(const Pixel& p1, const Pixel& p2) const;
+        private:
+        bool redX, greenX, blueX;
+    };
+
     /* The angle comparator can reorder a pixelvector 
      * in a way that makes it seem like the individual pixels are rotated.
      * Provide an angle argument (in degrees) when constructing.

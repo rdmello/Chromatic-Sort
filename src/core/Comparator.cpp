@@ -23,6 +23,15 @@ bool PixelSort::WeightedComparator::operator()(const Pixel& p1, const Pixel& p2)
     return total1 < total2;
 }
 
+PixelSort::BoolWeightedComparator::BoolWeightedComparator(bool r, bool g, bool b):
+    redX(r), greenX(g), blueX(b) {};
+
+bool PixelSort::BoolWeightedComparator::operator()(const Pixel& p1, const Pixel& p2) const {
+    uint16_t total1 = (redX ? p1.red() : 0) + (greenX ? p1.green() : 0) + (blueX ? p1.blue() : 0);
+    uint16_t total2 = (redX ? p2.red() : 0) + (greenX ? p2.green() : 0) + (blueX ? p2.blue() : 0);
+    return total1 < total2;
+}
+
 PixelSort::AngleComparator::AngleComparator(): angle(0) {};
 PixelSort::AngleComparator::AngleComparator(double angle) { setAngle(angle); };
 

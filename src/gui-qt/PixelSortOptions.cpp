@@ -46,10 +46,7 @@ PixelSortOptions::~PixelSortOptions() {};
 void PixelSortOptions::doSort() 
 {
     /* Create comparator */
-    double rComp = sortColors[0] ? 1 : 0;
-    double gComp = sortColors[1] ? 1 : 0;
-    double bComp = sortColors[2] ? 1 : 0;
-    PS::WeightedComparator comp(rComp, gComp, bComp);
+    PS::BoolWeightedComparator comp(sortColors[0], sortColors[1], sortColors[2]);
 
     /* Create applicator */
     PS::ApplyFcn applyFcn = sendColor<true, true, true>;

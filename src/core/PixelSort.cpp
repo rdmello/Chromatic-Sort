@@ -70,7 +70,7 @@ void PixelSort::PixelVector::sort(const CompareFcn& comparator) {
 
 /* UNSTABLE SORT */ 
 void PixelSort::PixelVector::unstable_sort(const Comparator& comparator) {
-    std::sort(pixels.begin(), pixels.end(), comparator);
+    std::sort(pixels.begin(), pixels.end(), std::ref(comparator));
 }
 void PixelSort::PixelVector::unstable_sort(const CompareFcn& comparator) {
     std::sort(pixels.begin(), pixels.end(), comparator);
