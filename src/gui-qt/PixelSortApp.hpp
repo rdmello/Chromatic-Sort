@@ -82,6 +82,10 @@ private:
     QLabel angleLabel;
     QDial angleDial;
 
+    /* Start Point */
+    QSpinBox startX;
+    QSpinBox startY;
+
     /* Box Size */
     QSpinBox boxW;
     QSpinBox boxH;

@@ -47,6 +47,8 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     bMax(Qt::Horizontal, &dockwidget_mid),
     angleLabel("Angle"),
     angleDial(&dockwidget_mid),
+    startX(&dockwidget_mid),
+    startY(&dockwidget_mid),
     boxW(&dockwidget_mid),
     boxH(&dockwidget_mid),
     distX(&dockwidget_mid),
@@ -175,13 +177,25 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     formlayout.addRow(&angleLabel);
     formlayout.addRow(&angleDial);
 
+    /* Set start X and Y properties */
+    startX.setMinimum(0);
+    startX.setMaximum(100000);
+    startX.setSingleStep(100);
+    startX.setValue(0);
+    startY.setMinimum(0);
+    startY.setMaximum(100000);
+    startY.setSingleStep(100);
+    startY.setValue(0);
+    formlayout.addRow("StartX", &startX);
+    formlayout.addRow("StartY", &startY);
+
     /* Set box width and height properties */
     boxW.setMinimum(1);
-    boxW.setMaximum(10000);
+    boxW.setMaximum(100000);
     boxW.setSingleStep(100);
     boxW.setValue(200);
     boxH.setMinimum(1);
-    boxH.setMaximum(10000);
+    boxH.setMaximum(100000);
     boxH.setSingleStep(100);
     boxH.setValue(200);
     formlayout.addRow("Width", &boxW);
@@ -189,11 +203,11 @@ PixelSortApp::PixelSortApp(QApplication* parent):
 
     /* Set repeat width and height properties */
     distX.setMinimum(200);
-    distX.setMaximum(10000);
+    distX.setMaximum(100000);
     distX.setSingleStep(100);
     distX.setValue(200);
     distY.setMinimum(200);
-    distY.setMaximum(10000);
+    distY.setMaximum(100000);
     distY.setSingleStep(100);
     distY.setValue(200);
     formlayout.addRow("RepeatX", &distX);
@@ -259,15 +273,21 @@ void PixelSortApp::sortButtonAction()
     opts.moveColors[0] = rMove.isChecked();
     opts.moveColors[1] = gMove.isChecked();
     opts.moveColors[2] = bMove.isChecked();
+
     opts.colorMatcher[0] = double(rMin.value()) / 100.0;
     opts.colorMatcher[1] = double(rMax.value()) / 100.0;
     opts.colorMatcher[2] = double(gMin.value()) / 100.0;
     opts.colorMatcher[3] = double(gMax.value()) / 100.0;
     opts.colorMatcher[4] = double(bMin.value()) / 100.0;
     opts.colorMatcher[5] = double(bMax.value()) / 100.0;
+
     opts.theta = 45.0*double(angleDial.value());
+
+    opts.rect[0] = startX.value();
+    opts.rect[1] = startY.value();
     opts.rect[2] = boxW.value();
     opts.rect[3] = boxH.value();
+
     opts.Xrepeat[1] = distX.value();
     opts.Yrepeat[1] = distY.value();
 
