@@ -37,14 +37,10 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     rMove("", &moveContainer),
     gMove("", &moveContainer),
     bMove("", &moveContainer),
-    minLabel("Min Threshold", &dockwidget_mid),
-    rMin(Qt::Horizontal, &dockwidget_mid),
-    gMin(Qt::Horizontal, &dockwidget_mid),
-    bMin(Qt::Horizontal, &dockwidget_mid),
-    maxLabel("Max Threshold", &dockwidget_mid),
-    rMax(Qt::Horizontal, &dockwidget_mid),
-    gMax(Qt::Horizontal, &dockwidget_mid),
-    bMax(Qt::Horizontal, &dockwidget_mid),
+    minColBtn("Min Color", &dockwidget_mid),
+    maxColBtn("Max Color", &dockwidget_mid),
+    minColDialog(QColor(0, 0, 0), &dockwidget_mid),
+    maxColDialog(QColor(255, 255, 255), &dockwidget_mid),
     angleLabel("Angle"),
     angleDial(&dockwidget_mid),
     startX(&dockwidget_mid),
@@ -135,39 +131,21 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     rMove.setStyleSheet("background-color: red;");
     gMove.setStyleSheet("background-color: green;");
     bMove.setStyleSheet("background-color: blue;");
-
-    rMin.setStyleSheet("background-color: red");
-    rMax.setStyleSheet("background-color: red");
-    gMin.setStyleSheet("background-color: green");
-    gMax.setStyleSheet("background-color: green");
-    bMin.setStyleSheet("background-color: blue");
-    bMax.setStyleSheet("background-color: blue");
-    rMin.setMinimum(0);
-    rMin.setMaximum(100);
-    gMin.setMinimum(0);
-    gMin.setMaximum(100);
-    bMin.setMinimum(0);
-    bMin.setMaximum(100);
-    rMax.setMinimum(0);
-    rMax.setMaximum(100);
-    gMax.setMinimum(0);
-    gMax.setMaximum(100);
-    bMax.setMinimum(0);
-    bMax.setMaximum(100);
-    rMax.setValue(100);
-    gMax.setValue(100);
-    bMax.setValue(100);
-   
+    
     formlayout.addRow("Sort", &sortContainer);
     formlayout.addRow("Move", &moveContainer);
-    formlayout.addRow(&minLabel);
-    formlayout.addRow(&rMin);
-    formlayout.addRow(&gMin);
-    formlayout.addRow(&bMin);
-    formlayout.addRow(&maxLabel);
-    formlayout.addRow(&rMax);
-    formlayout.addRow(&gMax);
-    formlayout.addRow(&bMax);
+
+    /* Matcher threshold dialogs */
+    // we can't use the native macOS dialog here
+    // since Qt won't use the preset color value unless turned off
+    minColDialog.setOption(QColorDialog::DontUseNativeDialog);
+    maxColDialog.setOption(QColorDialog::DontUseNativeDialog);
+    minColDialog.setCurrentColor(QColor(0, 0, 0));
+    maxColDialog.setCurrentColor(QColor(255, 255, 255));
+    QObject::connect(&minColBtn, &QPushButton::clicked, &minColDialog, &QColorDialog::exec);
+    QObject::connect(&maxColBtn, &QPushButton::clicked, &maxColDialog, &QColorDialog::exec);
+    formlayout.addRow(&minColBtn);
+    formlayout.addRow(&maxColBtn);
 
     /* Set angle control property */
     angleDial.setWrapping(true);
@@ -274,13 +252,15 @@ void PixelSortApp::sortButtonAction()
     opts.moveColors[1] = gMove.isChecked();
     opts.moveColors[2] = bMove.isChecked();
 
-    opts.colorMatcher[0] = double(rMin.value()) / 100.0;
-    opts.colorMatcher[1] = double(rMax.value()) / 100.0;
-    opts.colorMatcher[2] = double(gMin.value()) / 100.0;
-    opts.colorMatcher[3] = double(gMax.value()) / 100.0;
-    opts.colorMatcher[4] = double(bMin.value()) / 100.0;
-    opts.colorMatcher[5] = double(bMax.value()) / 100.0;
-
+    QColor minCol = minColDialog.currentColor();
+    QColor maxCol = maxColDialog.currentColor();
+    opts.colorMatcher[0] = double(minCol.red()) / 255;
+    opts.colorMatcher[2] = double(minCol.green()) / 255;
+    opts.colorMatcher[4] = double(minCol.blue()) / 255;
+    opts.colorMatcher[1] = double(maxCol.red()) / 255;
+    opts.colorMatcher[3] = double(maxCol.green()) / 255;
+    opts.colorMatcher[5] = double(maxCol.blue()) / 255;
+        
     opts.theta = 45.0*double(angleDial.value());
 
     opts.rect[0] = startX.value();

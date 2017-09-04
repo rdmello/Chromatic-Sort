@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QKeySequence>
+#include <QColorDialog>
 
 // PixelSort includes
 #include "PixelSortOptions.hpp"
@@ -68,15 +69,11 @@ private:
     QCheckBox gMove;
     QCheckBox bMove;
 
-    /* Matcher options sliders */
-    QLabel minLabel;
-    QSlider rMin;
-    QSlider gMin;
-    QSlider bMin;
-    QLabel maxLabel;
-    QSlider rMax;
-    QSlider gMax;
-    QSlider bMax;
+    /* Color matcher options dialog */
+    QPushButton minColBtn;
+    QPushButton maxColBtn;
+    QColorDialog minColDialog;
+    QColorDialog maxColDialog;
 
     /* Angle controls */
     QLabel angleLabel;
