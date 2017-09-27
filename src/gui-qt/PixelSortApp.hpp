@@ -93,6 +93,10 @@ private:
 
     QPushButton sortbutton;
     // QPushButton quitbutton;
+    QPushButton ZoomInBtn;
+    QPushButton ZoomOutBtn;
+    QPushButton ZoomResetBtn;
+    QPushButton PanBtn;
         
     QMenu fileMenu; 
     

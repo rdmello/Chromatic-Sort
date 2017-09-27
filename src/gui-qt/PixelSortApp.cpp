@@ -50,6 +50,10 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     distX(&dockwidget_mid),
     distY(&dockwidget_mid),
     sortbutton("PixelSort", &dockwidget_mid),
+    ZoomInBtn("Zoom In"),
+    ZoomOutBtn("Zoom Out"),
+    ZoomResetBtn("Reset View"),
+    PanBtn("Pan"),
     fileMenu("File"),
     img(),
     drv(img)
@@ -206,7 +210,11 @@ PixelSortApp::PixelSortApp(QApplication* parent):
     img.load(imageFilePath);
     QPixmap newImg = QPixmap::fromImage(img);
     mainImg = scene.addPixmap(newImg);
+    updateScene(newImg);
     opts.setImage(&drv);
+    // scene.setSceneRect(0, 0, img.width(), img.height());
+    // view.setSceneRect(0, 0, img.width(), img.height());
+    // view.setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 
     statusBar()->showMessage("New image successfully loaded: " + imageFilePath);
 
